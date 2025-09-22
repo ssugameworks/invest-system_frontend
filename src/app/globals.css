@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@utility font-h1-22 {
+  font-weight: 700;
+  font-size: 1.375rem; /* font-size: 22px → 1.375rem */
+  line-height: 1.5625rem; /* line-height: 25px → 1.5625rem */
+  letter-spacing: -0.0186em; /* letter-spacing: -0.41px (font-size 22px 기준) → -0.0186em */
+}
+@utility font-h2-20 {
+  font-weight: 700;
+  font-size: 1.25rem; /* font-size: 20px → 1.25rem  (20 ÷ 16 = 1.25) */
+  line-height: 1.25rem; /* line-height: 20px → 1.25rem */
+  letter-spacing: -0.0205em; /* letter-spacing: -0.41px → -0.0205em  (-0.41 ÷ 20 ≈ -0.0205) */
+}
+@utility font-h3-18 {
+  font-weight: 600;
+  font-size: 1.125rem; /* font-size: 18px → 1.125rem (18 ÷ 16 = 1.125) */
+  line-height: 1.2; /* line-height: 120% → 1.2 (unitless가 권장, 폰트 크기 기준 비율) */
+  letter-spacing: -0.05em; /* letter-spacing: -5% → -0.05em (글자 크기의 -5%) */
+}
+@utility font-h4-18 {
+  font-weight: 500;
+  font-size: 1.125rem; /* font-size: 18px → 1.125rem (18 ÷ 16 = 1.125) */
+  line-height: 1.25rem; /* line-height: 20px → 1.25rem (20 ÷ 16 = 1.25) */
+  letter-spacing: -0.0228em; /* letter-spacing: -0.41px → -0.0228em (-0.41 ÷ 18 ≈ -0.0228) */
+}
+@utility font-h5-17 {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0241em;
+}
+
+@utility font-t1-14 {
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  letter-spacing: -0.0293em;
+}
+@utility font-t2-14 {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0293em;
+}
+@utility font-t3-12 {
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0342em;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary-100: #87bffa;
+  --color-primary-500: #4097f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
