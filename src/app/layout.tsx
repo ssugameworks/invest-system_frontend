@@ -11,9 +11,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: '장학온',
-  description:
-    '사용자에게 맞는 장학금 정보를 빠르게 탐색할 수 있도록 도와주는 서비스',
+  title: 'FLOW : Startup Bridge',
+  description: 'FLOW : Startup Bridge 모의투자시스템 ',
 };
 
 export default function RootLayout({
