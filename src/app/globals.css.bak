@@ -1,0 +1,163 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@utility font-h1-22 {
+  font-weight: 700;
+  font-size: 1.375rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0186em;
+}
+@utility font-h2-20 {
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.25rem;
+  letter-spacing: -0.0205em;
+}
+@utility font-h3-18 {
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.2;
+  letter-spacing: -0.05em;
+}
+@utility font-h4-18 {
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.25rem;
+  letter-spacing: -0.0228em;
+}
+@utility font-h5-17 {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0241em;
+}
+
+@utility font-t1-14 {
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1rem;
+  letter-spacing: -0.0293em;
+}
+@utility font-t2-14 {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0293em;
+}
+@utility font-t3-12 {
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.5625rem;
+  letter-spacing: -0.0342em;
+}
+
+/* Color utilities */
+@utility bg-outer {
+  background-color: #0a0a0a;
+}
+@utility bg-main {
+  background-color: #141414;
+}
+@utility bg-card {
+  background-color: #282828;
+}
+@utility bg-bottom-sheet {
+  background-color: #2d2d2d;
+}
+@utility bg-placeholder {
+  background-color: #d9d9d9;
+}
+@utility text-primary-dark {
+  color: #282828;
+}
+@utility text-secondary {
+  color: #888888;
+}
+@utility text-tertiary {
+  color: #666568;
+}
+@utility text-accent-yellow {
+  color: #efff8f;
+}
+@utility text-purple {
+  color: #977bff;
+}
+@utility border-card {
+  border-color: #434343;
+}
+@utility border-light {
+  border-color: #f1f1f1;
+}
+
+/* Font family utilities */
+@utility font-pretendard {
+  font-family: 'Pretendard', sans-serif;
+}
+@utility font-jost {
+  font-family: 'Jost', sans-serif;
+}
+
+/* Combined font utilities */
+@utility heading-32-extrabold {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+}
+@utility price-20-semibold {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+}
+@utility label-18-medium {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+}
+@utility team-16-semibold {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+@utility button-14-semibold {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+@utility label-14-light {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+}
+@utility label-12-normal {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+}
+@utility member-10-normal {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary-100: #87bffa;
+  --color-primary-500: #4097f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
