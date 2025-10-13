@@ -79,11 +79,3 @@
   line-height: 1.5625rem;
   letter-spacing: -0.0342em;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark mode adjustments */
-    --background: 0 0% 4%;
-    --foreground: 0 0% 93%;
-  }
-}
