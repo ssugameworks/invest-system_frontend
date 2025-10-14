@@ -62,28 +62,28 @@ export default function BottomSheet({
 
       {/* Bottom Sheet */}
       <div
-        className={`fixed bottom-0 left-1/2 z-50 h-[624px] w-full max-w-[393px] -translate-x-1/2 rounded-tl-40 rounded-tr-40 border border-border-card bg-background-bottom-sheet transition-transform duration-300 ease-in-out ${
+        className={`fixed bottom-0 left-1/2 z-50 h-[624px] w-full max-w-[393px] -translate-x-1/2 rounded-tl-[40px] rounded-tr-[40px] border border-border-card bg-background-bottom-sheet transition-transform duration-300 ease-in-out ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         {/* Handle Bar */}
-        <div className="absolute left-1/2 top-[9px] h-1 w-20 -translate-x-1/2 rounded-100 bg-white" />
+        <div className="absolute left-1/2 top-[9px] h-1 w-20 -translate-x-1/2 rounded-[100px] bg-white" />
 
         {/* Content */}
         <div className="h-full overflow-y-auto px-5 pb-5 scrollbar-hide">
           {/* Total Investment Section */}
           <div className="mb-8 mt-[53px]">
-            <p className="mb-[3px] font-pretendard text-18 font-medium text-white">
+            <p className="mb-[3px] font-pretendard text-[18px] font-medium text-white">
               총 투자금
             </p>
-            <p className="font-pretendard text-32 font-semibold text-accent-yellow text-shadow-[0_0_20px_#efff8f]">
+            <p className="font-pretendard text-[32px] font-semibold text-accent-yellow" style={{ textShadow: '0 0 20px #efff8f' }}>
               {totalInvestment}
             </p>
           </div>
 
           {/* PDF Section */}
           <div className="mb-8">
-            <p className="mb-2 font-pretendard text-14 font-light text-text-secondary">
+            <p className="mb-2 font-pretendard text-[14px] font-light text-text-secondary">
               발표자료
             </p>
             <div className="flex gap-[3px]">
@@ -111,7 +111,7 @@ export default function BottomSheet({
 
           {/* Comments Section */}
           <div className="mb-8">
-            <div className="mb-2 flex items-center justify-between font-pretendard text-14 text-text-secondary">
+            <div className="mb-2 flex w-full items-center justify-between font-pretendard text-[14px] text-text-secondary">
               <p className="font-light">실시간 댓글</p>
               <p className="font-medium">더보기 &gt;</p>
             </div>
@@ -119,12 +119,12 @@ export default function BottomSheet({
               {comments.map((comment, index) => (
                 <div
                   key={index}
-                  className="flex h-[38px] flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
+                  className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
                 >
-                  <p className="mb-[2px] font-pretendard text-10 font-regular text-accent-yellow">
+                  <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
                     {comment.nickname} ({comment.studentId})
                   </p>
-                  <p className="font-pretendard text-12 font-medium text-white">
+                  <p className="font-pretendard text-[12px] font-medium text-white">
                     {comment.content}
                   </p>
                 </div>
@@ -134,24 +134,24 @@ export default function BottomSheet({
 
           {/* Investment Input */}
           <div className="mb-[13px]">
-            <div className="flex h-[45px] items-center rounded-[5px] border border-border-card bg-background px-[19px]">
+            <div className="flex h-[45px] w-full items-center rounded-[5px] border border-border-card bg-background px-[19px]">
               <input
                 type="text"
                 value={investAmount}
                 onChange={handleInvestAmountChange}
                 placeholder="투자할 금액을 입력해주세요"
-                className="w-full bg-transparent font-pretendard text-16 font-medium text-white placeholder:text-text-secondary focus:outline-none"
+                className="w-full bg-transparent font-pretendard text-[16px] font-medium text-white placeholder:text-text-secondary focus:outline-none"
               />
             </div>
           </div>
 
           {/* Investment Button */}
-          <div>
+          <div className="flex justify-center">
             <button
               disabled={!isInvestButtonEnabled}
-              className={`h-[50px] w-full rounded-[10px] font-pretendard text-16 font-semibold transition-colors ${
+              className={`h-[50px] w-full rounded-[10px] font-pretendard text-[16px] font-semibold transition-colors ${
                 isInvestButtonEnabled
-                  ? 'bg-accent-yellow text-background hover:bg-accent-yellow/90'
+                  ? 'bg-accent-yellow text-background hover:opacity-90'
                   : 'cursor-not-allowed bg-[#c4c4c4] text-white'
               }`}
             >
