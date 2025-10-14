@@ -8,6 +8,7 @@ interface InvestmentFormProps {
 
 export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
   const [investAmount, setInvestAmount] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleInvestAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
@@ -35,13 +36,19 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
           className={`flex h-[45px] w-full items-center justify-center border bg-background px-[19px] transition-all ${
             investAmount
               ? 'rounded-[10px] border-border-card'
-              : 'rounded-[5px] border-border-card'
+              : 'rounded-[5px]'
+          } ${
+            isFocused && !investAmount
+              ? 'border-border-focus'
+              : 'border-border-card'
           }`}
         >
           <input
             type="text"
             value={formatNumberWithCommas(investAmount)}
             onChange={handleInvestAmountChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholder="투자할 금액을 입력해주세요"
             className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
               investAmount
