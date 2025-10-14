@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import BottomSheetBase from './BottomSheetBase';
 import CommentsSection from './CommentsSection';
 import InvestmentForm from './InvestmentForm';
@@ -35,9 +35,20 @@ export default function InvestmentBottomSheet({
 }: InvestmentBottomSheetProps) {
   const { isAnimating, close } = useBottomSheet(isOpen);
   const [showAllComments, setShowAllComments] = useState(false);
+  const [currentPdfIndex, setCurrentPdfIndex] = useState(0);
+  const pdfScrollRef = useRef<HTMLDivElement>(null);
 
   const handleClose = () => {
     close(onClose);
+  };
+
+  const handlePdfScroll = () => {
+    if (pdfScrollRef.current && pdfUrls.length > 0) {
+      const scrollLeft = pdfScrollRef.current.scrollLeft;
+      const itemWidth = 188 + 3; // width + gap
+      const index = Math.round(scrollLeft / itemWidth);
+      setCurrentPdfIndex(index);
+    }
   };
 
   return (
@@ -63,27 +74,38 @@ export default function InvestmentBottomSheet({
 
           {/* PDF Section */}
           <div className="mb-8">
-            <p className="mb-2 font-pretendard text-[14px] font-light text-text-secondary">
-              발표자료
-            </p>
-            <div className="flex gap-[3px]">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="font-pretendard text-[14px] font-light text-text-secondary">
+                발표자료
+              </p>
+              {pdfUrls.length > 0 && (
+                <p className="font-pretendard text-[12px] font-light text-text-secondary">
+                  {currentPdfIndex + 1} / {pdfUrls.length}
+                </p>
+              )}
+            </div>
+            <div
+              ref={pdfScrollRef}
+              onScroll={handlePdfScroll}
+              className="flex gap-[3px] overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+            >
               {pdfUrls.length > 0 ? (
-                pdfUrls.slice(0, 2).map((url, index) => (
+                pdfUrls.map((url, index) => (
                   <div
                     key={index}
-                    className="h-[115px] w-[188px] overflow-hidden rounded-[5px] bg-background-placeholder"
+                    className="h-[115px] w-[188px] flex-shrink-0 snap-start overflow-hidden rounded-[5px] bg-background-placeholder"
                   >
                     <iframe
                       src={url}
-                      className="h-full w-full"
+                      className="h-full w-full pointer-events-none"
                       title={`PDF ${index + 1}`}
                     />
                   </div>
                 ))
               ) : (
                 <>
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
+                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-[5px] bg-background-placeholder" />
+                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-[5px] bg-background-placeholder" />
                 </>
               )}
             </div>
