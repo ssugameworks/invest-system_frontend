@@ -27,6 +27,8 @@ export default function BottomSheet({
 }: BottomSheetProps) {
   const [investAmount, setInvestAmount] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showAllComments, setShowAllComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -75,104 +77,193 @@ export default function BottomSheet({
         <div className="absolute left-1/2 top-[9px] h-1 w-20 -translate-x-1/2 rounded-[100px] bg-white" />
 
         {/* Content */}
-        <div className="h-full overflow-y-auto px-5 pb-5 scrollbar-hide">
-          {/* Total Investment Section */}
-          <div className="mb-8 mt-[53px]">
-            <p className="mb-[3px] font-pretendard text-[18px] font-medium text-white">
-              총 투자금
-            </p>
-            <p className="font-pretendard text-[32px] font-semibold text-accent-yellow" style={{ textShadow: '0 0 20px #efff8f' }}>
-              {totalInvestment}
-            </p>
-          </div>
+        <div className="relative h-full overflow-y-auto px-5 pb-5 scrollbar-hide">
+          {/* Total Investment Section - Hide when showing all comments */}
+          {!showAllComments && (
+            <>
+              <div className="mb-8 mt-[53px]">
+                <p className="mb-[3px] font-pretendard text-[18px] font-medium text-white">
+                  총 투자금
+                </p>
+                <p className="font-pretendard text-[32px] font-semibold text-accent-yellow" style={{ textShadow: '0 0 20px #efff8f' }}>
+                  {totalInvestment}
+                </p>
+              </div>
 
-          {/* PDF Section */}
-          <div className="mb-8">
-            <p className="mb-2 font-pretendard text-[14px] font-light text-text-secondary">
-              발표자료
-            </p>
-            <div className="flex gap-[3px]">
-              {pdfUrls.length > 0 ? (
-                pdfUrls.slice(0, 2).map((url, index) => (
-                  <div
-                    key={index}
-                    className="h-[115px] w-[188px] overflow-hidden rounded-[5px] bg-background-placeholder"
-                  >
-                    <iframe
-                      src={url}
-                      className="h-full w-full"
-                      title={`PDF ${index + 1}`}
-                    />
-                  </div>
-                ))
-              ) : (
-                <>
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
-                </>
-              )}
-            </div>
-          </div>
+              {/* PDF Section */}
+              <div className="mb-8">
+                <p className="mb-2 font-pretendard text-[14px] font-light text-text-secondary">
+                  발표자료
+                </p>
+                <div className="flex gap-[3px]">
+                  {pdfUrls.length > 0 ? (
+                    pdfUrls.slice(0, 2).map((url, index) => (
+                      <div
+                        key={index}
+                        className="h-[115px] w-[188px] overflow-hidden rounded-[5px] bg-background-placeholder"
+                      >
+                        <iframe
+                          src={url}
+                          className="h-full w-full"
+                          title={`PDF ${index + 1}`}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
+                      <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Comments Section */}
-          <div className="mb-8">
-            <div className="mb-2 flex w-full items-center justify-between font-pretendard text-[14px] text-text-secondary">
-              <p className="font-light">실시간 댓글</p>
-              <p className="font-medium">더보기 &gt;</p>
-            </div>
-            <div className="flex flex-col gap-[5px]">
-              {comments.map((comment, index) => (
-                <div
-                  key={index}
-                  className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
+          {!showAllComments ? (
+            <div className="mb-8">
+              <div className="mb-2 flex w-full items-center justify-between font-pretendard text-[14px] text-text-secondary">
+                <p className="font-light">실시간 댓글</p>
+                <button
+                  onClick={() => setShowAllComments(true)}
+                  className="font-medium hover:text-white"
                 >
-                  <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
-                    {comment.nickname} ({comment.studentId})
-                  </p>
-                  <p className="font-pretendard text-[12px] font-medium text-white">
-                    {comment.content}
-                  </p>
+                  더보기 &gt;
+                </button>
+              </div>
+              <div className="flex flex-col gap-[5px]">
+                {comments.slice(0, 3).map((comment, index) => (
+                  <div
+                    key={index}
+                    className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
+                  >
+                    <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
+                      {comment.nickname} ({comment.studentId})
+                    </p>
+                    <p className="font-pretendard text-[12px] font-medium text-white">
+                      {comment.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Back Button */}
+              <button
+                onClick={() => setShowAllComments(false)}
+                className="absolute left-5 top-[54px] z-10"
+              >
+                <svg
+                  width="12"
+                  height="23"
+                  viewBox="0 0 12 23"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11 1.5L1 11.5L11 21.5"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* All Comments List */}
+              <div className="mt-[99px] mb-[93px]">
+                <div className="flex flex-col gap-[8px]">
+                  {comments.map((comment, index) => (
+                    <div
+                      key={index}
+                      className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
+                    >
+                      <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
+                        {comment.nickname} ({comment.studentId})
+                      </p>
+                      <p className="font-pretendard text-[12px] font-medium text-white">
+                        {comment.content}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Investment Input */}
-          <div className="mb-[13px]">
-            <div
-              className={`flex h-[45px] w-full items-center justify-center border bg-background px-[19px] transition-all ${
-                investAmount
-                  ? 'rounded-[10px] border-border-card'
-                  : 'rounded-[5px] border-border-card'
-              }`}
-            >
-              <input
-                type="text"
-                value={formatNumberWithCommas(investAmount)}
-                onChange={handleInvestAmountChange}
-                placeholder="투자할 금액을 입력해주세요"
-                className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
-                  investAmount
-                    ? 'text-[20px] text-accent-yellow'
-                    : 'text-[16px] text-white placeholder:text-text-secondary'
-                }`}
-              />
-            </div>
-          </div>
+              {/* Comment Input */}
+              <div className="absolute bottom-5 left-5 right-5">
+                <div className="flex h-[45px] w-full items-center gap-[10px] rounded-[5px] border border-border-card bg-background px-[19px]">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="텍스트를 입력해주세요"
+                    className="w-full bg-transparent font-pretendard text-[14px] font-light text-white placeholder:text-[rgba(136,136,136,0.53)] focus:outline-none"
+                  />
+                  <button className="shrink-0">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
-          {/* Investment Button */}
-          <div className="flex justify-center">
-            <button
-              disabled={!isInvestButtonEnabled}
-              className={`h-[50px] w-full rounded-[10px] font-pretendard text-[16px] font-semibold transition-colors ${
-                isInvestButtonEnabled
-                  ? 'bg-accent-green text-[#282828] hover:opacity-90'
-                  : 'cursor-not-allowed bg-[#c4c4c4] text-white'
-              }`}
-            >
-              투자하기
-            </button>
-          </div>
+          {/* Investment Input - Only show when not showing all comments */}
+          {!showAllComments && (
+            <>
+              {/* Investment Input */}
+              <div className="mb-[13px]">
+                <div
+                  className={`flex h-[45px] w-full items-center justify-center border bg-background px-[19px] transition-all ${
+                    investAmount
+                      ? 'rounded-[10px] border-border-card'
+                      : 'rounded-[5px] border-border-card'
+                  }`}
+                >
+                  <input
+                    type="text"
+                    value={formatNumberWithCommas(investAmount)}
+                    onChange={handleInvestAmountChange}
+                    placeholder="투자할 금액을 입력해주세요"
+                    className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
+                      investAmount
+                        ? 'text-[20px] text-accent-yellow'
+                        : 'text-[16px] text-white placeholder:text-text-secondary'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Investment Button */}
+              <div className="flex justify-center">
+                <button
+                  disabled={!isInvestButtonEnabled}
+                  className={`h-[50px] w-full rounded-[10px] font-pretendard text-[16px] font-semibold transition-colors ${
+                    isInvestButtonEnabled
+                      ? 'bg-accent-green text-[#282828] hover:opacity-90'
+                      : 'cursor-not-allowed bg-[#c4c4c4] text-white'
+                  }`}
+                >
+                  투자하기
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
