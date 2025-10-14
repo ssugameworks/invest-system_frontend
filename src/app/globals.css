@@ -79,3 +79,12 @@
   line-height: 1.5625rem;
   letter-spacing: -0.0342em;
 }
+
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
