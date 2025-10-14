@@ -46,6 +46,11 @@ export default function BottomSheet({
     setInvestAmount(value);
   };
 
+  const formatNumberWithCommas = (value: string) => {
+    if (!value) return '';
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   const isInvestButtonEnabled = investAmount.length > 0;
 
   if (!isOpen && !isAnimating) return null;
@@ -135,7 +140,7 @@ export default function BottomSheet({
           {/* Investment Input */}
           <div className="mb-[13px]">
             <div
-              className={`flex h-[45px] w-full items-center border bg-background px-[19px] transition-all ${
+              className={`flex h-[45px] w-full items-center justify-center border bg-background px-[19px] transition-all ${
                 investAmount
                   ? 'rounded-[10px] border-border-card'
                   : 'rounded-[5px] border-border-card'
@@ -143,10 +148,10 @@ export default function BottomSheet({
             >
               <input
                 type="text"
-                value={investAmount}
+                value={formatNumberWithCommas(investAmount)}
                 onChange={handleInvestAmountChange}
                 placeholder="투자할 금액을 입력해주세요"
-                className={`w-full bg-transparent font-pretendard font-medium focus:outline-none ${
+                className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
                   investAmount
                     ? 'text-[20px] text-accent-yellow'
                     : 'text-[16px] text-white placeholder:text-text-secondary'
