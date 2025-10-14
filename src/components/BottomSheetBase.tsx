@@ -15,7 +15,7 @@ export default function BottomSheetBase({
   isAnimating,
   onClose,
   children,
-  height = 'h-[624px]',
+  height = 'h-[700px]',
 }: BottomSheetBaseProps) {
   if (!isOpen && !isAnimating) return null;
 
@@ -39,7 +39,7 @@ export default function BottomSheetBase({
         <div className="absolute left-1/2 top-[9px] h-1 w-20 -translate-x-1/2 rounded-[100px] bg-white" />
 
         {/* Content */}
-        <div className="relative h-full overflow-y-auto px-5 pb-5 scrollbar-hide">
+        <div className="relative h-full overflow-y-hidden px-5 pb-5">
           {children}
         </div>
       </div>

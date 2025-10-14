@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Button from './Button';
 
 interface InvestmentFormProps {
   onInvest?: (amount: number) => void;
@@ -31,12 +32,12 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
   return (
     <>
       {/* Investment Input */}
-      <div className="mb-[13px]">
+      <div className="mb-3">
         <div
-          className={`flex h-[45px] w-full items-center justify-center border bg-background px-[19px] transition-all ${
+          className={`flex h-11 w-full items-center justify-center border bg-background px-5 transition-all ${
             investAmount
-              ? 'rounded-[10px] border-border-card'
-              : 'rounded-[5px]'
+              ? 'rounded-lg border-border-card'
+              : 'rounded-md'
           } ${
             isFocused && !investAmount
               ? 'border-border-focus'
@@ -52,8 +53,8 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
             placeholder="투자할 금액을 입력해주세요"
             className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
               investAmount
-                ? 'text-[20px] text-accent-yellow'
-                : 'text-[16px] text-white placeholder:text-text-secondary'
+                ? 'text-xl text-accent-yellow'
+                : 'text-base text-white placeholder:text-text-secondary'
             }`}
           />
         </div>
@@ -61,17 +62,13 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
 
       {/* Investment Button */}
       <div className="flex justify-center">
-        <button
+        <Button
           disabled={!isInvestButtonEnabled}
           onClick={handleInvest}
-          className={`h-[50px] w-full rounded-[10px] font-pretendard text-[16px] font-semibold transition-colors ${
-            isInvestButtonEnabled
-              ? 'bg-accent-green text-[#282828] hover:opacity-90'
-              : 'cursor-not-allowed bg-[#c4c4c4] text-white'
-          }`}
+          className="w-full"
         >
           투자하기
-        </button>
+        </Button>
       </div>
     </>
   );

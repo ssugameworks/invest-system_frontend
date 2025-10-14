@@ -60,12 +60,12 @@ export default function InvestmentBottomSheet({
       {/* Total Investment Section - Hide when showing all comments */}
       {!showAllComments && (
         <>
-          <div className="mb-8 mt-[53px]">
-            <p className="mb-[3px] font-pretendard text-[18px] font-medium text-white">
+          <div className="mb-8 mt-14">
+            <p className="mb-1 font-pretendard text-lg font-medium text-white">
               총 투자금
             </p>
             <p
-              className="font-pretendard text-[32px] font-semibold text-accent-yellow"
+              className="font-pretendard text-3xl font-semibold text-accent-yellow"
               style={{ textShadow: '0 0 20px #efff8f' }}
             >
               {totalInvestment}
@@ -75,11 +75,11 @@ export default function InvestmentBottomSheet({
           {/* PDF Section */}
           <div className="mb-8">
             <div className="mb-2 flex items-center justify-between">
-              <p className="font-pretendard text-[16px] font-light text-text-secondary">
+              <p className="font-pretendard text-base font-light text-text-secondary">
                 발표자료
               </p>
               {pdfUrls.length > 0 && (
-                <p className="font-pretendard text-[12px] font-light text-text-secondary">
+                <p className="font-pretendard text-xs font-light text-text-secondary">
                   {currentPdfIndex + 1} / {pdfUrls.length}
                 </p>
               )}
@@ -87,13 +87,13 @@ export default function InvestmentBottomSheet({
             <div
               ref={pdfScrollRef}
               onScroll={handlePdfScroll}
-              className="flex gap-[3px] overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+              className="flex gap-1 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
             >
               {pdfUrls.length > 0 ? (
                 pdfUrls.map((url, index) => (
                   <div
                     key={index}
-                    className="h-[115px] w-[188px] flex-shrink-0 snap-start overflow-hidden rounded-[5px] bg-background-placeholder"
+                    className="h-[115px] w-[188px] flex-shrink-0 snap-start overflow-hidden rounded-md bg-background-placeholder"
                   >
                     <iframe
                       src={url}
@@ -104,8 +104,8 @@ export default function InvestmentBottomSheet({
                 ))
               ) : (
                 <>
-                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-[5px] bg-background-placeholder" />
-                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-[5px] bg-background-placeholder" />
+                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-md bg-background-placeholder" />
+                  <div className="h-[115px] w-[188px] flex-shrink-0 rounded-md bg-background-placeholder" />
                 </>
               )}
             </div>
