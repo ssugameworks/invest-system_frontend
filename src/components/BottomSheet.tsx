@@ -134,13 +134,23 @@ export default function BottomSheet({
 
           {/* Investment Input */}
           <div className="mb-[13px]">
-            <div className="flex h-[45px] w-full items-center rounded-[5px] border border-border-card bg-background px-[19px]">
+            <div
+              className={`flex h-[45px] w-full items-center border bg-background px-[19px] transition-all ${
+                investAmount
+                  ? 'rounded-[10px] border-border-card'
+                  : 'rounded-[5px] border-border-card'
+              }`}
+            >
               <input
                 type="text"
                 value={investAmount}
                 onChange={handleInvestAmountChange}
                 placeholder="투자할 금액을 입력해주세요"
-                className="w-full bg-transparent font-pretendard text-[16px] font-medium text-white placeholder:text-text-secondary focus:outline-none"
+                className={`w-full bg-transparent font-pretendard font-medium focus:outline-none ${
+                  investAmount
+                    ? 'text-[20px] text-accent-yellow'
+                    : 'text-[16px] text-white placeholder:text-text-secondary'
+                }`}
               />
             </div>
           </div>
@@ -151,7 +161,7 @@ export default function BottomSheet({
               disabled={!isInvestButtonEnabled}
               className={`h-[50px] w-full rounded-[10px] font-pretendard text-[16px] font-semibold transition-colors ${
                 isInvestButtonEnabled
-                  ? 'bg-accent-yellow text-background hover:opacity-90'
+                  ? 'bg-accent-green text-[#282828] hover:opacity-90'
                   : 'cursor-not-allowed bg-[#c4c4c4] text-white'
               }`}
             >
