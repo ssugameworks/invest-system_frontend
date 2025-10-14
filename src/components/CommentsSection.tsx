@@ -112,8 +112,8 @@ export default function CommentsSection({
 
 function CommentItem({ comment }: { comment: Comment }) {
   return (
-    <div className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]">
-      <p className="mb-[2px] font-pretendard text-[12px] font-regular text-accent-yellow">
+    <div className="flex w-full flex-col justify-center gap-0.5 rounded-[5px] bg-black px-[14px] py-[8px]">
+      <p className="font-pretendard text-[12px] font-regular text-accent-yellow">
         {comment.nickname} ({comment.studentId})
       </p>
       <p className="font-pretendard text-[14px] font-medium text-white">
