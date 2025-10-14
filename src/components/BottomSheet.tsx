@@ -138,10 +138,10 @@ export default function BottomSheet({
                     key={index}
                     className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]"
                   >
-                    <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
+                    <p className="mb-[2px] font-pretendard text-[12px] font-regular text-accent-yellow">
                       {comment.nickname} ({comment.studentId})
                     </p>
-                    <p className="font-pretendard text-[12px] font-medium text-white">
+                    <p className="font-pretendard text-[14px] font-medium text-white">
                       {comment.content}
                     </p>
                   </div>

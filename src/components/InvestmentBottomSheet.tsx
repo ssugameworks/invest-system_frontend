@@ -75,7 +75,7 @@ export default function InvestmentBottomSheet({
           {/* PDF Section */}
           <div className="mb-8">
             <div className="mb-2 flex items-center justify-between">
-              <p className="font-pretendard text-[14px] font-light text-text-secondary">
+              <p className="font-pretendard text-[16px] font-light text-text-secondary">
                 발표자료
               </p>
               {pdfUrls.length > 0 && (

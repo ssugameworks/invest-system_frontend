@@ -92,7 +92,7 @@ export default function CommentsSection({
 
   return (
     <div className="mb-8">
-      <div className="mb-2 flex w-full items-center justify-between font-pretendard text-[14px] text-text-secondary">
+      <div className="mb-2 flex w-full items-center justify-between font-pretendard text-[16px] text-text-secondary">
         <p className="font-light">실시간 댓글</p>
         <button
           onClick={() => onToggleShowAll?.(true)}
@@ -113,10 +113,10 @@ export default function CommentsSection({
 function CommentItem({ comment }: { comment: Comment }) {
   return (
     <div className="flex h-[38px] w-full flex-col justify-center rounded-[5px] bg-black px-[14px] py-[2px]">
-      <p className="mb-[2px] font-pretendard text-[10px] font-regular text-accent-yellow">
+      <p className="mb-[2px] font-pretendard text-[12px] font-regular text-accent-yellow">
         {comment.nickname} ({comment.studentId})
       </p>
-      <p className="font-pretendard text-[12px] font-medium text-white">
+      <p className="font-pretendard text-[14px] font-medium text-white">
         {comment.content}
       </p>
     </div>
