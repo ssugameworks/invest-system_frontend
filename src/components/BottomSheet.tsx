@@ -91,7 +91,7 @@ export default function BottomSheet({
                 pdfUrls.slice(0, 2).map((url, index) => (
                   <div
                     key={index}
-                    className="h-[115px] w-[188px] overflow-hidden rounded-[5px] bg-[#d9d9d9]"
+                    className="h-[115px] w-[188px] overflow-hidden rounded-[5px] bg-background-placeholder"
                   >
                     <iframe
                       src={url}
@@ -102,8 +102,8 @@ export default function BottomSheet({
                 ))
               ) : (
                 <>
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-[#d9d9d9]" />
-                  <div className="h-[115px] w-[188px] rounded-[5px] bg-[#d9d9d9]" />
+                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
+                  <div className="h-[115px] w-[188px] rounded-[5px] bg-background-placeholder" />
                 </>
               )}
             </div>
