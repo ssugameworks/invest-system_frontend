@@ -1,0 +1,36 @@
+import SendIcon from '@/assets/icons/send.svg';
+
+interface CommentInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit?: () => void;
+  placeholder?: string;
+}
+
+export default function CommentInput({
+  value,
+  onChange,
+  onSubmit,
+  placeholder = '텍스트를 입력해주세요',
+}: CommentInputProps) {
+  const handleSubmit = () => {
+    if (onSubmit) {
+      onSubmit();
+    }
+  };
+
+  return (
+    <div className="flex h-11 w-full items-center gap-2.5 rounded-md border border-border-card bg-background px-5">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full bg-transparent font-pretendard text-sm font-light text-white placeholder:text-[rgba(136,136,136,0.53)] focus:outline-none"
+      />
+      <button onClick={handleSubmit} className="shrink-0">
+        <SendIcon />
+      </button>
+    </div>
+  );
+}
