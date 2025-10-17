@@ -4,7 +4,7 @@ interface PDFSectionProps {
   pdfUrls: string[];
   currentIndex: number;
   onScroll: () => void;
-  scrollRef: RefObject<HTMLDivElement>;
+  scrollRef: RefObject<HTMLDivElement | null>;
 }
 
 export default function PDFSection({
