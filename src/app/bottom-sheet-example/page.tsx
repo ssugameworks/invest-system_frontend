@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import InvestmentBottomSheet from '@/components/InvestmentBottomSheet';
+import InvestmentBottomSheet from '@/components/BottomSheet/Investment/InvestmentBottomSheet';
 
 export default function BottomSheetExample() {
   const [isOpen, setIsOpen] = useState(false);
