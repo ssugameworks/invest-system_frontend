@@ -48,7 +48,6 @@ export default function InvestmentBottomSheet({
     }
   };
 
-  // @ts-expect-ignore
   return (
     <BottomSheetBase
       isOpen={isOpen}
