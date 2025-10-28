@@ -27,6 +27,8 @@ export default function InvestmentBottomSheet({
     { nickname: '멋진 댕댕이', studentId: '202418XX', content: '이건 좀 괜찮은듯' },
     { nickname: '동작구 까불이', studentId: '202418XX', content: '음 좀 별론데' },
     { nickname: '상도동 콩콩이', studentId: '202418XX', content: '요호 좋은데 좋은데' },
+    { nickname: '숭구리 당당', studentId: '202432XX', content: '🤯' },
+    { nickname: '화난 무지', studentId: '202432XX', content: '우앙' },
   ],
   onInvest,
 }: InvestmentBottomSheetProps) {

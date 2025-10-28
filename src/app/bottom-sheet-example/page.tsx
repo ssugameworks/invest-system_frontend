@@ -36,24 +36,6 @@ export default function BottomSheetExample() {
       <InvestmentBottomSheet
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        totalInvestment="₩23,450,000"
-        comments={[
-          {
-            nickname: '멋진 댕댕이',
-            studentId: '202418XX',
-            content: '이건 좀 괜찮은듯',
-          },
-          {
-            nickname: '동작구 까불이',
-            studentId: '202418XX',
-            content: '음 좋음 별론데',
-          },
-          {
-            nickname: '상도동 콩콩이',
-            studentId: '202418XX',
-            content: '요호 좋은데 좋은데',
-          },
-        ]}
       />
     </div>
   );
