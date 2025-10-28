@@ -18,7 +18,7 @@ export default function TextField({
       <input
         type={type}
         placeholder=" "
-        className={`peer w-full bg-transparent font-pretendard font-light text-16 text-white border-none outline-none pt-5 pb-1 transition-all placeholder:opacity-0 focus:text-20 focus:font-medium ${className}`}
+        className={`peer w-full bg-transparent font-pretendard font-light text-16 text-white border-none outline-none pt-5 pb-1 transition-all placeholder:opacity-0 focus:text-20 focus:font-medium [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] ${className}`}
         {...props}
       />
       {label && (
