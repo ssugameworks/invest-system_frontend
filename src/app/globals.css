@@ -91,3 +91,26 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Neon glow animation */
+@keyframes neon-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 10px #efff8f,
+      0 0 20px #efff8f,
+      0 0 40px #efff8f,
+      0 0 80px #efff8f;
+  }
+  50% {
+    text-shadow:
+      0 0 5px #efff8f,
+      0 0 10px #efff8f,
+      0 0 20px #efff8f,
+      0 0 40px #efff8f,
+      0 0 60px #efff8f;
+  }
+}
+
+.animate-neon-glow {
+  animation: neon-glow 4s ease-in-out infinite;
+}
