@@ -63,6 +63,7 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
       {/* Investment Button */}
       <div className="flex justify-center">
         <Button
+          variant="secondary"
           disabled={!isInvestButtonEnabled}
           onClick={handleInvest}
           className="w-full"

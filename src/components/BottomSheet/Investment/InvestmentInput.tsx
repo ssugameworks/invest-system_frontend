@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Button from '@/components/Button';
 
 export default function InvestmentInput() {
   const [investAmount, setInvestAmount] = useState('');
@@ -47,17 +48,14 @@ export default function InvestmentInput() {
       </div>
 
       <div className="flex justify-center">
-        <button
+        <Button
+          variant="secondary"
           disabled={!isInvestButtonEnabled}
           onClick={handleInvest}
-          className={`h-12 w-full rounded-lg font-pretendard text-base font-semibold transition-colors ${
-            isInvestButtonEnabled
-              ? 'bg-accent-green text-[#282828] hover:opacity-90'
-              : 'cursor-not-allowed bg-[#c4c4c4] text-white'
-          }`}
+          className="w-full"
         >
           투자하기
-        </button>
+        </Button>
       </div>
     </>
   );
