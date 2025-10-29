@@ -33,13 +33,13 @@ export default function PDFSection({
         {pdfUrls.length > 0 ? (
           pdfUrls.map((url, index) => (
             <div
-              key={index}
+              key={url}
               className="h-[7.2rem] w-[11.75rem] flex-shrink-0 snap-start overflow-hidden rounded-md bg-background-placeholder"
             >
               <iframe
                 src={url}
                 className="h-full w-full pointer-events-none"
-                title={`PDF ${index + 1}`}
+                title={`발표자료 ${index + 1}`}
               />
             </div>
           ))

@@ -36,8 +36,8 @@ export default function AllCommentsView({
       {/* Comments List with Scroll */}
       <div className="mt-24 mb-20 overflow-y-auto scrollbar-hide flex-1 px-5">
         <div className="flex flex-col gap-2">
-          {comments.map((comment, index) => (
-            <CommentItem key={index} comment={comment} />
+          {comments.map((comment) => (
+            <CommentItem key={comment.id} comment={comment} />
           ))}
         </div>
       </div>

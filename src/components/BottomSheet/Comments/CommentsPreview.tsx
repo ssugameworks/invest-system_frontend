@@ -28,8 +28,8 @@ export default function CommentsPreview({
         )}
       </div>
       <div className="flex flex-col gap-1.5">
-        {displayedComments.map((comment, index) => (
-          <CommentItem key={index} comment={comment} />
+        {displayedComments.map((comment) => (
+          <CommentItem key={comment.id} comment={comment} />
         ))}
       </div>
     </div>
