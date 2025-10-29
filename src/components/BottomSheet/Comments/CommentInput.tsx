@@ -22,18 +22,20 @@ export default function CommentInput({
   };
 
   return (
-    <div className="flex h-11 w-full items-center gap-2.5 rounded-md border border-border-card bg-background px-5">
+    <div className="flex h-11 w-full items-center gap-2.5 rounded-md border border-border-card bg-background px-5 transition-colors duration-200">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-transparent font-pretendard text-sm font-light text-white placeholder:text-[rgba(136,136,136,0.53)] focus:outline-none"
+        className="w-full bg-transparent font-pretendard text-base font-light text-white placeholder:text-text-secondary placeholder:opacity-60 focus:outline-none"
+        aria-label={placeholder}
       />
       <button
         onClick={handleSubmit}
         disabled={isInputEmpty}
         className="shrink-0 transition-all duration-200"
+        aria-label="댓글 제출"
       >
         <SendIcon
           className={`transition-colors duration-200 ${

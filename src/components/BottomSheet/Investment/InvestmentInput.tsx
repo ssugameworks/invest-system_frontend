@@ -25,23 +25,18 @@ export default function InvestmentInput() {
   return (
     <>
       <div className="mb-3">
-        <div
-          className={`flex h-11 w-full items-center justify-center border bg-background px-5 transition-all ${
-            investAmount
-              ? 'rounded-lg border-border-card'
-              : 'rounded-md border-border-card'
-          }`}
-        >
+        <div className="flex h-11 w-full items-center justify-center rounded-md border border-border-card bg-background px-5 transition-all duration-200">
           <input
             type="text"
             value={formatNumberWithCommas(investAmount)}
             onChange={handleInvestAmountChange}
             placeholder="투자할 금액을 입력해주세요"
-            className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
+            className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center placeholder:text-text-secondary placeholder:opacity-60 focus:outline-none transition-all duration-200 ${
               investAmount
                 ? 'text-xl text-accent-yellow'
-                : 'text-base text-white placeholder:text-text-secondary'
+                : 'text-base text-white'
             }`}
+            aria-label="투자 금액 입력"
           />
         </div>
       </div>
