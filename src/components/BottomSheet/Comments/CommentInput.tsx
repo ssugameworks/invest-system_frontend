@@ -13,8 +13,10 @@ export default function CommentInput({
   onSubmit,
   placeholder = '텍스트를 입력해주세요',
 }: CommentInputProps) {
+  const isInputEmpty = value.trim().length === 0;
+
   const handleSubmit = () => {
-    if (onSubmit) {
+    if (onSubmit && !isInputEmpty) {
       onSubmit();
     }
   };
@@ -28,8 +30,16 @@ export default function CommentInput({
         placeholder={placeholder}
         className="w-full bg-transparent font-pretendard text-sm font-light text-white placeholder:text-[rgba(136,136,136,0.53)] focus:outline-none"
       />
-      <button onClick={handleSubmit} className="shrink-0">
-        <SendIcon />
+      <button
+        onClick={handleSubmit}
+        disabled={isInputEmpty}
+        className="shrink-0 transition-all duration-200"
+      >
+        <SendIcon
+          className={`transition-colors duration-200 ${
+            isInputEmpty ? 'text-white opacity-40' : 'text-accent-yellow'
+          }`}
+        />
       </button>
     </div>
   );
