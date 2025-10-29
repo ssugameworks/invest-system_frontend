@@ -57,9 +57,15 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
 
   const scrollTo = (index: number) => {
     if (!containerRef.current) return;
-    const cardWidth = 163 + 10;
-    containerRef.current.scrollTo({
-      left: index * cardWidth,
+    const container = containerRef.current;
+    const firstCard = container.querySelector('[data-carousel-item]') as HTMLElement;
+    if (!firstCard) return;
+
+    const cardWidth = firstCard.offsetWidth;
+    const gap = 10;
+
+    container.scrollTo({
+      left: index * (cardWidth + gap),
       behavior: 'smooth',
     });
     setCurrentIndex(index);
@@ -68,8 +74,13 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
-      const cardWidth = 163 + 10;
-      const newIndex = Math.round(containerRef.current.scrollLeft / cardWidth);
+      const container = containerRef.current;
+      const firstCard = container.querySelector('[data-carousel-item]') as HTMLElement;
+      if (!firstCard) return;
+
+      const cardWidth = firstCard.offsetWidth;
+      const gap = 10;
+      const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
       setCurrentIndex(newIndex);
     };
 
@@ -82,7 +93,7 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
     <div className={`w-full ${className}`}>
       <div
         ref={containerRef}
-        className="flex gap-[10px] overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
+        className="flex gap-[10px] overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing px-4 md:px-0"
         style={{
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
@@ -97,12 +108,13 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
         {cards.map((card) => (
           <div
             key={card.id}
-            className="flex-shrink-0 w-[163px] h-[148px] bg-[#1A1A1A] rounded-[15px] px-[15px] py-[30px] flex flex-col items-center justify-between border-[1.2px] border-[#434343]"
+            data-carousel-item
+            className="flex-shrink-0 w-[168px] sm:w-[180px] md:w-[200px] lg:w-[220px] h-[148px] sm:h-[160px] md:h-[180px] bg-[#1A1A1A] rounded-[15px] px-[15px] py-[30px] sm:py-[30px] flex flex-col items-center justify-between border-[1.5px] border-[#434343]"
             style={{ scrollSnapAlign: 'start' }}
           >
             <div className="flex items-start justify-start w-full">
               <div
-                className="text-[#EFFF8F] text-lg font-semibold"
+                className="text-[#EFFF8F] text-lg sm:text-xl md:text-2xl font-semibold"
                 style={{
                   filter: 'drop-shadow(0 0 5px #EFFF8F)',
                 }}
@@ -110,16 +122,16 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
                 {card.amount}
               </div>
             </div>
-            <div className="flex items-end gap-[15px] w-full pb-1">
-              <div className="flex flex-col gap-1 flex-1">
-                <div className="text-white font-semibold text-base leading-none">
+            <div className="flex items-end gap-[12px] sm:gap-[15px] w-full pb-1">
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <div className="text-white font-semibold text-base sm:text-lg leading-none truncate">
                   {card.title}
                 </div>
-                <div className="text-[#EFFF8F] text-[10px] leading-none">
+                <div className="text-[#EFFF8F] text-xs sm:text-sm leading-none truncate">
                   {card.members}
                 </div>
               </div>
-              <div className="w-[28px] h-[28px] flex items-center justify-center flex-shrink-0 -mb-1">
+              <div className="w-[24px] h-[24px] sm:w-[28px] sm:h-[28px] flex items-center justify-center flex-shrink-0 -mb-1">
                 <SendIcon className="w-full h-full text-[#EFFF8F]" style={{ display: 'block' }} />
               </div>
             </div>
@@ -132,8 +144,10 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
             <button
               key={index}
               onClick={() => scrollTo(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex ? 'bg-white w-6' : 'bg-gray-500'
+              className={`h-2 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'bg-white w-6'
+                  : 'bg-gray-500 w-2'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
