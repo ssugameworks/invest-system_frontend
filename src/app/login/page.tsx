@@ -66,13 +66,19 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} aria-label="로그인 폼">
         {/* Input Fields */}
         <div className="absolute left-1/2 -translate-x-1/2 top-[20.25rem] w-[19.6875rem] flex flex-col gap-6">
           <TextField
             label="학번"
             type="text"
             inputMode="numeric"
+            maxLength={8}
+            autoComplete="username"
+            aria-label="학번 8자리를 입력하세요"
+            aria-required="true"
+            aria-invalid={!!showStudentIdError}
+            aria-describedby={showStudentIdError ? 'studentId-error' : undefined}
             error={showStudentIdError}
             isValid={isStudentIdValid}
             {...register('studentId')}
@@ -80,6 +86,11 @@ export default function LoginPage() {
           <TextField
             label="비밀번호"
             type="password"
+            autoComplete="current-password"
+            aria-label="비밀번호를 입력하세요"
+            aria-required="true"
+            aria-invalid={!!showPasswordError}
+            aria-describedby={showPasswordError ? 'password-error' : undefined}
             error={showPasswordError}
             isValid={isPasswordValid}
             {...register('password')}
@@ -93,6 +104,7 @@ export default function LoginPage() {
             variant={isValid ? 'primary' : 'disabled'}
             disabled={!isValid}
             className="w-full h-[3.125rem] rounded-[0.625rem] text-16"
+            aria-label={isValid ? '로그인하기' : '학번과 비밀번호를 모두 입력해주세요'}
           >
             투자시작하기
           </Button>

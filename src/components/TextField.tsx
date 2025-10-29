@@ -17,6 +17,7 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       className = '',
       error,
       isValid,
+      name,
       ...props
     },
     ref,
@@ -27,11 +28,14 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       return 'bg-text-secondary';
     };
 
+    const errorId = name ? `${name}-error` : undefined;
+
     return (
       <div className={`group relative w-full ${error ? 'mb-5' : ''}`}>
         <input
           ref={ref}
           type={type}
+          name={name}
           placeholder=" "
           className={`peer font-pretendard text-16 focus:text-20 w-full border-none bg-transparent pt-5 pb-1 font-light text-white transition-all outline-none [-moz-appearance:textfield] placeholder:opacity-0 focus:font-medium [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${className}`}
           {...props}
@@ -43,7 +47,11 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         )}
         <div className={`h-px w-full transition-colors ${getBorderColor()}`} />
         {error && (
-          <p className="font-pretendard text-12 absolute top-full left-0 mt-1 text-red-500">
+          <p
+            id={errorId}
+            className="font-pretendard text-12 absolute top-full left-0 mt-1 text-red-500"
+            role="alert"
+          >
             {error}
           </p>
         )}
