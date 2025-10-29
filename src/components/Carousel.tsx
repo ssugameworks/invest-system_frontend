@@ -14,9 +14,10 @@ export interface CarouselCard {
 interface CarouselProps {
   cards: CarouselCard[];
   className?: string;
+  onCardClick?: (cardId: string) => void;
 }
 
-export default function Carousel({ cards, className = '' }: CarouselProps) {
+export default function Carousel({ cards, className = '', onCardClick }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -131,9 +132,16 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
                   {card.members}
                 </div>
               </div>
-              <div className="w-[24px] h-[24px] sm:w-[28px] sm:h-[28px] flex items-center justify-center flex-shrink-0 -mb-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardClick?.(card.id);
+                }}
+                className="w-[24px] h-[24px] sm:w-[28px] sm:h-[28px] flex items-center justify-center flex-shrink-0 -mb-1 cursor-pointer hover:opacity-80 transition-opacity"
+                aria-label={`${card.title} 상세 정보 보기`}
+              >
                 <SendIcon className="w-full h-full text-[#EFFF8F]" style={{ display: 'block' }} />
-              </div>
+              </button>
             </div>
           </div>
         ))}
