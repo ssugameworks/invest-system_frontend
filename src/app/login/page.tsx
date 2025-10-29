@@ -2,21 +2,10 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import GameworksLogo from '@/assets/icons/gameworks-logo.svg';
-
-const loginSchema = z.object({
-  studentId: z
-    .string()
-    .min(1, '학번을 입력해주세요')
-    .regex(/^\d+$/, '학번은 숫자만 입력 가능합니다')
-    .length(8, '학번은 8자리여야 합니다'),
-  password: z.string().min(1, '비밀번호를 입력해주세요'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { loginSchema, type LoginFormData } from '@/schemas/auth.schema';
 
 export default function LoginPage() {
   const {
