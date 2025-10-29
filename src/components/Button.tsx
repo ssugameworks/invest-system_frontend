@@ -16,7 +16,7 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'rounded-lg font-pretendard font-semibold transition-colors';
+  const baseStyles = 'rounded-lg font-pretendard font-semibold transition-colors duration-200';
 
   const variantStyles = {
     primary: 'bg-accent-yellow text-background-card shadow-[0px_0px_15px_0px_#efff8f] hover:opacity-90',
@@ -35,6 +35,7 @@ export default function Button({
   return (
     <button
       disabled={disabled}
+      aria-disabled={disabled}
       className={`${baseStyles} ${variantStyles[currentVariant]} ${sizeStyles[size]} ${className}`}
       {...props}
     >

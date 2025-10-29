@@ -55,6 +55,7 @@ export default function InvestmentBottomSheet({
       isOpen={isOpen}
       isAnimating={isAnimating}
       onClose={handleClose}
+      ariaLabel="투자 정보 및 댓글"
     >
       {/* Investment Info - Hide when showing all comments */}
       {!showAllComments && (
