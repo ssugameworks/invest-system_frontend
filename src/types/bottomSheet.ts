@@ -1,7 +1,9 @@
 export interface Comment {
+  id: string;
   nickname: string;
   studentId: string;
   content: string;
+  createdAt?: Date;
 }
 
 export interface BottomSheetProps {

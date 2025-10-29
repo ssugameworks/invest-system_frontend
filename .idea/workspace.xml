@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c88d1bde-ac3e-4600-912d-8cd315f6e318" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/src/components/BottomSheet/Investment/InvestmentBottomSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/BottomSheet/Investment/InvestmentBottomSheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,11 +50,11 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feat/btm-sheet-main에 #15개",
+    "git-widget-placeholder": "feat/login-main",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "/Users/joonwoo/Developer/invest-system_frontend/src/app",
+    "last_opened_file_path": "/Users/joonwoo/Developer/invest-system_frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -93,7 +93,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-js-predefined-d6986cc7102b-75c7c973e13d-JavaScript-WS-253.27864.34" />
       </set>
     </attachedChunks>
   </component>
@@ -113,7 +113,12 @@
       <workItem from="1760406826339" duration="9871000" />
       <workItem from="1760427772366" duration="153000" />
       <workItem from="1760600721949" duration="612000" />
-      <workItem from="1760677152197" duration="2775000" />
+      <workItem from="1760677152197" duration="3173000" />
+      <workItem from="1760712894207" duration="174000" />
+      <workItem from="1760713114523" duration="947000" />
+      <workItem from="1761637276184" duration="215000" />
+      <workItem from="1761637504878" duration="60000" />
+      <workItem from="1761644912304" duration="8991000" />
     </task>
     <servers />
   </component>

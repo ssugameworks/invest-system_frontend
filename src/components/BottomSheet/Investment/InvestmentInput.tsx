@@ -1,63 +1,55 @@
 'use client';
 
 import { useState } from 'react';
+import Button from '@/components/Button';
+import { extractNumbers, formatNumberWithCommas } from '@/utils/formatters';
 
 export default function InvestmentInput() {
   const [investAmount, setInvestAmount] = useState('');
 
   const handleInvestAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    const value = extractNumbers(e.target.value);
     setInvestAmount(value);
-  };
-
-  const formatNumberWithCommas = (value: string) => {
-    if (!value) return '';
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   const isInvestButtonEnabled = investAmount.length > 0;
 
   const handleInvest = () => {
     // TODO: 투자 로직 구현
-    console.log('Invest amount:', investAmount);
+    if (investAmount) {
+      const amount = parseInt(investAmount, 10);
+      // API 호출 등 투자 로직
+    }
   };
 
   return (
     <>
       <div className="mb-3">
-        <div
-          className={`flex h-11 w-full items-center justify-center border bg-background px-5 transition-all ${
-            investAmount
-              ? 'rounded-lg border-border-card'
-              : 'rounded-md border-border-card'
-          }`}
-        >
+        <div className="flex h-11 w-full items-center justify-center rounded-md border border-border-card bg-background px-5 transition-all duration-200">
           <input
             type="text"
             value={formatNumberWithCommas(investAmount)}
             onChange={handleInvestAmountChange}
             placeholder="투자할 금액을 입력해주세요"
-            className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center focus:outline-none ${
+            className={`w-full bg-transparent text-center font-pretendard font-medium placeholder:text-center placeholder:text-text-secondary placeholder:opacity-60 focus:outline-none transition-all duration-200 ${
               investAmount
                 ? 'text-xl text-accent-yellow'
-                : 'text-base text-white placeholder:text-text-secondary'
+                : 'text-base text-white'
             }`}
+            aria-label="투자 금액 입력"
           />
         </div>
       </div>
 
       <div className="flex justify-center">
-        <button
+        <Button
+          variant="secondary"
           disabled={!isInvestButtonEnabled}
           onClick={handleInvest}
-          className={`h-12 w-full rounded-lg font-pretendard text-base font-semibold transition-colors ${
-            isInvestButtonEnabled
-              ? 'bg-accent-green text-[#282828] hover:opacity-90'
-              : 'cursor-not-allowed bg-[#c4c4c4] text-white'
-          }`}
+          className="w-full"
         >
           투자하기
-        </button>
+        </Button>
       </div>
     </>
   );

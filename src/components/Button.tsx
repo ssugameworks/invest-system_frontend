@@ -16,11 +16,11 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'rounded-lg font-pretendard font-semibold transition-colors';
+  const baseStyles = 'rounded-lg font-pretendard font-semibold transition-colors duration-200';
 
   const variantStyles = {
-    primary: 'bg-accent-green text-[#282828] hover:opacity-90',
-    secondary: 'bg-background-card text-white border border-border-card hover:bg-opacity-80',
+    primary: 'bg-accent-yellow text-background-card shadow-[0px_0px_15px_0px_#efff8f] hover:opacity-90',
+    secondary: 'bg-accent-green text-[#282828] hover:opacity-90',
     disabled: 'cursor-not-allowed bg-[#c4c4c4] text-white',
   };
 
@@ -35,6 +35,7 @@ export default function Button({
   return (
     <button
       disabled={disabled}
+      aria-disabled={disabled}
       className={`${baseStyles} ${variantStyles[currentVariant]} ${sizeStyles[size]} ${className}`}
       {...props}
     >
