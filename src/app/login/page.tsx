@@ -15,7 +15,8 @@ export default function LoginPage() {
     watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: 'onChange',
+    mode: 'onBlur', // 첫 검증은 blur 시
+    reValidateMode: 'onChange', // 에러 발생 후에는 실시간 재검증
   });
 
   const formValues = watch();
