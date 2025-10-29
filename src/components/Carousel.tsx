@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import SendIcon from '@/assets/icons/send.svg';
 
 export interface CarouselCard {
   id: string;
@@ -56,7 +57,7 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
 
   const scrollTo = (index: number) => {
     if (!containerRef.current) return;
-    const cardWidth = 163 + 10; // card width + gap
+    const cardWidth = 163 + 10;
     containerRef.current.scrollTo({
       left: index * cardWidth,
       behavior: 'smooth',
@@ -79,7 +80,6 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Carousel Container */}
       <div
         ref={containerRef}
         className="flex gap-[10px] overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
@@ -94,32 +94,15 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
       >
-        {cards.map((card, index) => (
+        {cards.map((card) => (
           <div
             key={card.id}
-            className="flex-shrink-0 w-[163px] h-[148px] bg-[#1A1A1A] rounded-[15px] px-[15px] py-[13px] flex flex-col items-center justify-between"
+            className="flex-shrink-0 w-[163px] h-[148px] bg-[#1A1A1A] rounded-[15px] px-[15px] py-[30px] flex flex-col items-center justify-between border-[1.2px] border-[#434343]"
             style={{ scrollSnapAlign: 'start' }}
           >
-            {/* Top Section */}
-            <div className="flex flex-col items-center gap-[5px]">
-              {/* Avatar */}
-              <div className="w-5 h-5 rounded-full bg-[#D9D9D9]" />
-
-              {/* Title and Members */}
-              <div className="flex flex-col gap-1 items-start">
-                <div className="text-white font-semibold text-base leading-none">
-                  {card.title}
-                </div>
-                <div className="text-[#888888] text-xs leading-none">
-                  {card.members}
-                </div>
-              </div>
-            </div>
-
-            {/* Amount */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-start justify-start w-full">
               <div
-                className="text-[#EFFF8F] text-sm font-normal"
+                className="text-[#EFFF8F] text-lg font-semibold"
                 style={{
                   filter: 'drop-shadow(0 0 5px #EFFF8F)',
                 }}
@@ -127,11 +110,22 @@ export default function Carousel({ cards, className = '' }: CarouselProps) {
                 {card.amount}
               </div>
             </div>
+            <div className="flex items-end gap-[15px] w-full pb-1">
+              <div className="flex flex-col gap-1 flex-1">
+                <div className="text-white font-semibold text-base leading-none">
+                  {card.title}
+                </div>
+                <div className="text-[#EFFF8F] text-[10px] leading-none">
+                  {card.members}
+                </div>
+              </div>
+              <div className="w-[28px] h-[28px] flex items-center justify-center flex-shrink-0 -mb-1">
+                <SendIcon className="w-full h-full text-[#EFFF8F]" style={{ display: 'block' }} />
+              </div>
+            </div>
           </div>
         ))}
       </div>
-
-      {/* Indicators */}
       {cards.length > 1 && (
         <div className="flex justify-center gap-2 mt-4">
           {cards.map((_, index) => (
