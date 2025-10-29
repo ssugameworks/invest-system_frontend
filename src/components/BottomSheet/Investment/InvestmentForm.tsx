@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from '@/components/Button';
+import { extractNumbers, formatNumberWithCommas } from '@/utils/formatters';
 
 interface InvestmentFormProps {
   onInvest?: (amount: number) => void;
@@ -12,13 +13,8 @@ export default function InvestmentForm({ onInvest }: InvestmentFormProps) {
   const [isFocused, setIsFocused] = useState(false);
 
   const handleInvestAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    const value = extractNumbers(e.target.value);
     setInvestAmount(value);
-  };
-
-  const formatNumberWithCommas = (value: string) => {
-    if (!value) return '';
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   const handleInvest = () => {

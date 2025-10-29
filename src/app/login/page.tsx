@@ -30,7 +30,6 @@ export default function LoginPage() {
   const showPasswordError = touchedFields.password ? errors.password?.message : undefined;
 
   const onSubmit = (data: LoginFormData) => {
-    console.log('로그인 데이터:', data);
     // TODO: 로그인 API 호출
   };
 
