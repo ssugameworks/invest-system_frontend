@@ -45,11 +45,11 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             {label}
           </label>
         )}
-        <div className={`h-px w-full transition-colors ${getBorderColor()}`} />
+        <div className={`h-px w-full transition-colors duration-200 ${getBorderColor()}`} />
         {error && (
           <p
             id={errorId}
-            className="font-pretendard text-12 absolute top-full left-0 mt-1 text-red-500"
+            className="font-pretendard text-12 absolute top-full left-0 mt-1 text-red-500 animate-fade-in-up"
             role="alert"
           >
             {error}
