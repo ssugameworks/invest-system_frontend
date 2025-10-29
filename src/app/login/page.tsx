@@ -29,12 +29,11 @@ export default function LoginPage() {
     mode: 'onChange',
   });
 
-  const studentId = watch('studentId');
-  const password = watch('password');
+  const formValues = watch();
 
   // 개별 필드 유효성 검사 (강조색 표시용)
-  const isStudentIdValid = dirtyFields.studentId && !errors.studentId && studentId?.length === 8;
-  const isPasswordValid = dirtyFields.password && !errors.password && password?.length > 0;
+  const isStudentIdValid = dirtyFields.studentId && !errors.studentId && formValues.studentId?.length === 8;
+  const isPasswordValid = dirtyFields.password && !errors.password && formValues.password?.length > 0;
 
   // 에러는 blur된 필드만 표시 (UX 개선)
   const showStudentIdError = touchedFields.studentId ? errors.studentId?.message : undefined;
