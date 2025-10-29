@@ -1,15 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import GameworksLogo from '@/assets/icons/gameworks-logo.svg';
 
-export default function LoginPage() {
-  const [studentId, setStudentId] = useState('');
-  const [password, setPassword] = useState('');
+const loginSchema = z.object({
+  studentId: z
+    .string()
+    .min(1, '학번을 입력해주세요')
+    .regex(/^\d+$/, '학번은 숫자만 입력 가능합니다')
+    .length(8, '학번은 8자리여야 합니다'),
+  password: z.string().min(1, '비밀번호를 입력해주세요'),
+});
 
-  const isFormValid = studentId.length === 8 && password.trim() !== '';
+type LoginFormData = z.infer<typeof loginSchema>;
+
+export default function LoginPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, dirtyFields, touchedFields },
+    watch,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onChange',
+  });
+
+  const studentId = watch('studentId');
+  const password = watch('password');
+
+  // 개별 필드 유효성 검사 (강조색 표시용)
+  const isStudentIdValid = dirtyFields.studentId && !errors.studentId && studentId?.length === 8;
+  const isPasswordValid = dirtyFields.password && !errors.password && password?.length > 0;
+
+  // 에러는 blur된 필드만 표시 (UX 개선)
+  const showStudentIdError = touchedFields.studentId ? errors.studentId?.message : undefined;
+  const showPasswordError = touchedFields.password ? errors.password?.message : undefined;
+
+  const onSubmit = (data: LoginFormData) => {
+    console.log('로그인 데이터:', data);
+    // TODO: 로그인 API 호출
+  };
 
   return (
     <div className="relative w-full h-screen bg-background-card overflow-hidden">
@@ -33,40 +67,38 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Input Fields */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-[20.25rem] w-[19.6875rem] flex flex-col gap-6">
-        <TextField
-          label="학번"
-          type="number"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={8}
-          value={studentId}
-          onChange={(e) => {
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            if (value.length <= 8) {
-              setStudentId(value);
-            }
-          }}
-        />
-        <TextField
-          label="비밀번호"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Input Fields */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20.25rem] w-[19.6875rem] flex flex-col gap-6">
+          <TextField
+            label="학번"
+            type="text"
+            inputMode="numeric"
+            error={showStudentIdError}
+            isValid={isStudentIdValid}
+            {...register('studentId')}
+          />
+          <TextField
+            label="비밀번호"
+            type="password"
+            error={showPasswordError}
+            isValid={isPasswordValid}
+            {...register('password')}
+          />
+        </div>
 
-      {/* Submit Button */}
-      <div className="absolute left-1/2 bottom-[2.5625rem] -translate-x-1/2 w-[21.25rem]">
-        <Button
-          variant={isFormValid ? 'primary' : 'disabled'}
-          disabled={!isFormValid}
-          className="w-full h-[3.125rem] rounded-[0.625rem] text-16"
-        >
-          투자시작하기
-        </Button>
-      </div>
+        {/* Submit Button */}
+        <div className="absolute left-1/2 bottom-[2.5625rem] -translate-x-1/2 w-[21.25rem]">
+          <Button
+            type="submit"
+            variant={isValid ? 'primary' : 'disabled'}
+            disabled={!isValid}
+            className="w-full h-[3.125rem] rounded-[0.625rem] text-16"
+          >
+            투자시작하기
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
