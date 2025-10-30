@@ -6,6 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="c88d1bde-ac3e-4600-912d-8cd315f6e318" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/carousel-example/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/carousel-example/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/BottomSheet/Investment/InvestmentBottomSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/BottomSheet/Investment/InvestmentBottomSheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Carousel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Carousel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/constants/teamData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/constants/teamData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/hooks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/bottomSheet.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/bottomSheet.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/types" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/utils" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +58,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feat/login-main",
+    "git-widget-placeholder": "feat/carousel-main",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
@@ -119,6 +127,10 @@
       <workItem from="1761637276184" duration="215000" />
       <workItem from="1761637504878" duration="60000" />
       <workItem from="1761644912304" duration="8991000" />
+      <workItem from="1761736706606" duration="953000" />
+      <workItem from="1761737854074" duration="205000" />
+      <workItem from="1761738151672" duration="544000" />
+      <workItem from="1761739284157" duration="10418000" />
     </task>
     <servers />
   </component>

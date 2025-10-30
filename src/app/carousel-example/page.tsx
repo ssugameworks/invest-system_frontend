@@ -16,7 +16,7 @@ export default function CarouselExamplePage() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<TeamDetail | null>(null);
 
-  const handleCardClick = (teamId: string) => {
+  const handleCardClick = (teamId: number) => {
     const team = sampleTeams.find((t) => t.id === teamId);
     if (team) {
       setSelectedTeam(team);

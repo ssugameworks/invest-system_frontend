@@ -11,7 +11,7 @@ const CAROUSEL_GAP = 10; // gap-2.5 (0.625rem = 10px)와 동기화 필요
 const SCROLL_DEBOUNCE_MS = 50;
 
 export interface CarouselCard {
-  id: string;
+  id: number;
   title: string;
   members: string;
   totalInvestment: number;
@@ -21,7 +21,7 @@ export interface CarouselCard {
 interface CarouselProps {
   cards: CarouselCard[];
   className?: string;
-  onCardClick?: (cardId: string) => void;
+  onCardClick?: (cardId: number) => void;
 }
 
 export default function Carousel({ cards, className = '', onCardClick }: CarouselProps) {

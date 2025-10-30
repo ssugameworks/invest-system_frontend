@@ -1,7 +1,7 @@
 export interface Comment {
-  id: string;
+  id: number;
   nickname: string;
-  studentId: string;
+  studentId: number;
   content: string;
   createdAt?: Date;
 }

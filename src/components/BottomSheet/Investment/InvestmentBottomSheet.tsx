@@ -25,11 +25,11 @@ export default function InvestmentBottomSheet({
   totalInvestment = 23450000,
   pdfUrls = [],
   comments = [
-    { id: '1', nickname: '멋진 댕댕이', studentId: '202418XX', content: '이건 좀 괜찮은듯' },
-    { id: '2', nickname: '동작구 까불이', studentId: '202418XX', content: '음 좀 별론데' },
-    { id: '3', nickname: '상도동 콩콩이', studentId: '202418XX', content: '요호 좋은데 좋은데' },
-    { id: '4', nickname: '숭구리 당당', studentId: '202432XX', content: '🤯' },
-    { id: '5', nickname: '화난 무지', studentId: '202432XX', content: '우앙' },
+    { id: 1, nickname: '멋진 댕댕이', studentId: 20241801, content: '이건 좀 괜찮은듯' },
+    { id: 2, nickname: '동작구 까불이', studentId: 20241802, content: '음 좀 별론데' },
+    { id: 3, nickname: '상도동 콩콩이', studentId: 20241803, content: '요호 좋은데 좋은데' },
+    { id: 4, nickname: '숭구리 당당', studentId: 20243201, content: '🤯' },
+    { id: 5, nickname: '화난 무지', studentId: 20243202, content: '우앙' },
   ],
   onInvest,
 }: InvestmentBottomSheetProps) {
