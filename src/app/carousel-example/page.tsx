@@ -3,84 +3,13 @@
 import { useState } from 'react';
 import Carousel, { CarouselCard } from '@/components/Carousel';
 import InvestmentBottomSheet from '@/components/BottomSheet/Investment/InvestmentBottomSheet';
-import { Comment } from '@/types/bottomSheet';
-
-interface TeamDetail {
-  id: string;
-  title: string;
-  members: string;
-  amount: string;
-  totalInvestment: string;
-  pdfUrls: string[];
-  comments: Comment[];
-}
-
-const sampleTeams: TeamDetail[] = [
-  {
-    id: '1',
-    title: '일식이 조아',
-    members: '정제훈, 김용기, 최효우',
-    amount: '₩200,000',
-    totalInvestment: '₩150,000',
-    pdfUrls: [],
-    comments: [
-      { id: '1', nickname: '투자왕', studentId: '202418XX', content: '일식 좋아하시는군요!' },
-      { id: '2', nickname: '맛집러버', studentId: '202419XX', content: '이거 괜찮을듯' },
-    ],
-  },
-  {
-    id: '2',
-    title: 'TIO',
-    members: '편유나, 김민규',
-    amount: '₩200,000',
-    totalInvestment: '₩180,000',
-    pdfUrls: [],
-    comments: [
-      { id: '1', nickname: '테크러버', studentId: '202420XX', content: 'TIO 화이팅!' },
-      { id: '2', nickname: '개발자', studentId: '202421XX', content: '기대됩니다' },
-    ],
-  },
-  {
-    id: '3',
-    title: 'TIO',
-    members: '정제훈, 김용기, 최효우',
-    amount: '₩200,000',
-    totalInvestment: '₩100,000',
-    pdfUrls: [],
-    comments: [
-      { id: '1', nickname: '스타트업', studentId: '202422XX', content: '좋은 아이디어네요' },
-    ],
-  },
-  {
-    id: '4',
-    title: 'Game Studio',
-    members: '김철수, 이영희',
-    amount: '₩150,000',
-    totalInvestment: '₩120,000',
-    pdfUrls: [],
-    comments: [
-      { id: '1', nickname: '게이머', studentId: '202423XX', content: '게임 개발 응원합니다' },
-    ],
-  },
-  {
-    id: '5',
-    title: 'Design Team',
-    members: '박민수, 최지은, 홍길동',
-    amount: '₩300,000',
-    totalInvestment: '₩250,000',
-    pdfUrls: [],
-    comments: [
-      { id: '1', nickname: '디자이너', studentId: '20242424', content: '디자인팀 최고!' },
-      { id: '2', nickname: 'UI러버', studentId: '20242524', content: '멋져요' },
-    ],
-  },
-];
+import { sampleTeams, TeamDetail } from '@/constants/teamData';
 
 const sampleCards: CarouselCard[] = sampleTeams.map((team) => ({
   id: team.id,
   title: team.title,
   members: team.members,
-  amount: team.amount,
+  totalInvestment: team.totalInvestment,
 }));
 
 export default function CarouselExamplePage() {
@@ -100,7 +29,8 @@ export default function CarouselExamplePage() {
         <h1 className="text-white text-2xl md:text-3xl font-bold mb-8">반응형 캐러셀 컴포넌트</h1>
         <div className="mb-12">
           <h2 className="text-white text-lg md:text-xl mb-4">데스크톱 뷰</h2>
-          <div className="bg-gray-900 p-6 rounded-lg"><Carousel cards={sampleCards} onCardClick={handleCardClick} /></div>
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <Carousel cards={sampleCards} onCardClick={handleCardClick} /></div>
         </div>
         <div className="mb-12">
           <h2 className="text-white text-lg md:text-xl mb-4">모바일 화면 미리보기</h2>
