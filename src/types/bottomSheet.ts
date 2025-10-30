@@ -9,7 +9,7 @@ export interface Comment {
 export interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  totalInvestment?: string;
+  totalInvestment?: number;
   pdfUrls?: string[];
   comments?: Comment[];
 }

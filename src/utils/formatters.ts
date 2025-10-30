@@ -30,3 +30,12 @@ export function formatNumberWithCommas(value: string | number): string {
 export function parseFormattedNumber(value: string): number {
   return parseInt(value.replace(/,/g, ''), 10);
 }
+
+/**
+ * 숫자를 통화 형식으로 포맷팅 (원화)
+ * @param amount - 금액 (숫자)
+ * @returns 통화 형식의 문자열 (예: ₩1,000,000)
+ */
+export function formatCurrency(amount: number): string {
+  return `₩${formatNumberWithCommas(amount)}`;
+}

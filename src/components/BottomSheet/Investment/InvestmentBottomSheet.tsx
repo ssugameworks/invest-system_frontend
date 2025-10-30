@@ -8,11 +8,12 @@ import TotalInvestment from './TotalInvestment';
 import PDFSection from './PDFSection';
 import { useBottomSheet } from '@/hooks/useBottomSheet';
 import { Comment } from '@/types/bottomSheet';
+import { formatCurrency } from '@/utils/formatters';
 
 interface InvestmentBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  totalInvestment?: string;
+  totalInvestment?: number;
   pdfUrls?: string[];
   comments?: Comment[];
   onInvest?: (amount: number) => void;
@@ -21,7 +22,7 @@ interface InvestmentBottomSheetProps {
 export default function InvestmentBottomSheet({
   isOpen,
   onClose,
-  totalInvestment = '₩23,450,000',
+  totalInvestment = 23450000,
   pdfUrls = [],
   comments = [
     { id: '1', nickname: '멋진 댕댕이', studentId: '202418XX', content: '이건 좀 괜찮은듯' },
@@ -60,7 +61,7 @@ export default function InvestmentBottomSheet({
       {/* Investment Info - Hide when showing all comments */}
       {!showAllComments && (
         <>
-          <TotalInvestment amount={totalInvestment} />
+          <TotalInvestment amount={formatCurrency(totalInvestment)} />
           <PDFSection
             pdfUrls={pdfUrls}
             currentIndex={currentPdfIndex}
