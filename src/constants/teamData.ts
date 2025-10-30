@@ -1,5 +1,9 @@
 import { Comment } from '@/types/bottomSheet';
 
+/**
+ * 투자 팀 상세 정보
+ * API 연결 전 임시 데이터 구조
+ */
 export interface TeamDetail {
   id: string;
   title: string;
