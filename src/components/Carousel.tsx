@@ -2,12 +2,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import SendIcon from '@/assets/icons/send.svg';
+import { formatCurrency } from '@/utils/formatters';
 
 export interface CarouselCard {
   id: string;
   title: string;
   members: string;
-  amount: string;
+  totalInvestment: number;
   avatar?: string;
 }
 
@@ -120,7 +121,7 @@ export default function Carousel({ cards, className = '', onCardClick }: Carouse
                   filter: 'drop-shadow(0 0 5px #EFFF8F)',
                 }}
               >
-                {card.amount}
+                {formatCurrency(card.totalInvestment)}
               </div>
             </div>
             <div className="flex items-end gap-[12px] sm:gap-[15px] w-full pb-1">
