@@ -4,10 +4,10 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import SendIcon from '@/assets/icons/send.svg';
 import { formatCurrency } from '@/utils/formatters';
 import { debounce } from '@/utils/debounce';
+import { useCarouselDrag } from '@/hooks/useCarouselDrag';
 
 // 캐러셀 설정 상수 (Tailwind 클래스와 동일하게 유지)
 const CAROUSEL_GAP = 10; // gap-2.5 (0.625rem = 10px)와 동기화 필요
-const DRAG_SPEED_MULTIPLIER = 1.5;
 const SCROLL_DEBOUNCE_MS = 50;
 
 export interface CarouselCard {
@@ -26,47 +26,10 @@ interface CarouselProps {
 
 export default function Carousel({ cards, className = '', onCardClick }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.pageX - (containerRef.current?.offsetLeft || 0));
-    setScrollLeft(containerRef.current?.scrollLeft || 0);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - (containerRef.current.offsetLeft || 0);
-    const walk = (x - startX) * DRAG_SPEED_MULTIPLIER;
-    containerRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    const touch = e.touches[0];
-    setStartX(touch.pageX - (containerRef.current?.offsetLeft || 0));
-    setScrollLeft(containerRef.current?.scrollLeft || 0);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    const touch = e.touches[0];
-    const x = touch.pageX - (containerRef.current.offsetLeft || 0);
-    const walk = (x - startX) * DRAG_SPEED_MULTIPLIER;
-    containerRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
+  // 드래그 및 터치 인터랙션
+  const dragHandlers = useCarouselDrag(containerRef);
 
   const scrollTo = (index: number) => {
     if (!containerRef.current) return;
@@ -119,13 +82,13 @@ export default function Carousel({ cards, className = '', onCardClick }: Carouse
         role="region"
         aria-label="투자 팀 캐러셀"
         aria-live="polite"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onMouseDown={dragHandlers.handleMouseDown}
+        onMouseMove={dragHandlers.handleMouseMove}
+        onMouseUp={dragHandlers.handleMouseUp}
+        onMouseLeave={dragHandlers.handleMouseUp}
+        onTouchStart={dragHandlers.handleTouchStart}
+        onTouchMove={dragHandlers.handleTouchMove}
+        onTouchEnd={dragHandlers.handleTouchEnd}
       >
         {cards.map((card) => (
           <div
