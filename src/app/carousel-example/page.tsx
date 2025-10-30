@@ -68,16 +68,25 @@ export default function CarouselExamplePage() {
               <li>🎯 스냅 스크롤 (카드 단위)</li>
               <li>🔘 인디케이터 (현재 위치 표시)</li>
               <li>📐 반응형 레이아웃</li>
+              <li>♿ 접근성 향상 (ARIA)</li>
               <li>➡️ Send 아이콘 클릭 → BottomSheet 열기</li>
             </ul>
           </div>
           <div className="bg-gray-900 p-6 rounded-lg">
             <h3 className="text-white text-lg mb-4">📱 반응형 브레이크포인트</h3>
             <ul className="text-gray-400 space-y-2">
-              <li><span className="text-green-400">Mobile:</span> 163px 카드</li>
-              <li><span className="text-blue-400">SM (640px+):</span> 180px 카드</li>
-              <li><span className="text-purple-400">MD (768px+):</span> 200px 카드</li>
-              <li><span className="text-orange-400">LG (1024px+):</span> 220px 카드</li>
+              <li>
+                <span className="text-green-400">XS (~640px):</span> 168×148px 카드
+              </li>
+              <li>
+                <span className="text-blue-400">SM (640px+):</span> 180×160px 카드
+              </li>
+              <li>
+                <span className="text-purple-400">MD (768px+):</span> 200×180px 카드
+              </li>
+              <li>
+                <span className="text-orange-400">LG (1024px+):</span> 220×200px 카드
+              </li>
             </ul>
           </div>
         </div>
