@@ -1,7 +1,7 @@
 export interface Comment {
-  id: string;
+  id: number;
   nickname: string;
-  studentId: string;
+  studentId: number;
   content: string;
   createdAt?: Date;
 }
@@ -9,7 +9,7 @@ export interface Comment {
 export interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  totalInvestment?: string;
+  totalInvestment?: number;
   pdfUrls?: string[];
   comments?: Comment[];
 }
