@@ -22,14 +22,20 @@ export default function LoginPage() {
   // 개별 필드만 구독하여 불필요한 리렌더링 방지
   const studentId = watch('studentId');
   const password = watch('password');
+  const department = watch('department');
+  const phoneNumber = watch('phoneNumber');
 
   // 개별 필드 유효성 검사 (강조색 표시용)
   const isStudentIdValid = dirtyFields.studentId && !errors.studentId && studentId?.length === 8;
   const isPasswordValid = dirtyFields.password && !errors.password && password?.length > 0;
+  const isDepartmentValid = dirtyFields.department && !errors.department && !!department?.length;
+  const isPhoneNumberValid = dirtyFields.phoneNumber && !errors.phoneNumber && phoneNumber?.length === 11;
 
   // 에러는 blur된 필드만 표시 (UX 개선)
   const showStudentIdError = touchedFields.studentId ? errors.studentId?.message : undefined;
   const showPasswordError = touchedFields.password ? errors.password?.message : undefined;
+  const showDepartmentError = touchedFields.department ? errors.department?.message : undefined;
+  const showPhoneNumberError = touchedFields.phoneNumber ? errors.phoneNumber?.message : undefined;
 
   const onSubmit = (data: LoginFormData) => {
     // TODO: 로그인 API 호출
@@ -85,6 +91,32 @@ export default function LoginPage() {
             error={showPasswordError}
             isValid={isPasswordValid}
             {...register('password')}
+          />
+          <TextField
+            label="학부"
+            type="text"
+            autoComplete="organization"
+            aria-label="학부를 입력하세요"
+            aria-required="true"
+            aria-invalid={!!showDepartmentError}
+            aria-describedby={showDepartmentError ? 'department-error' : undefined}
+            error={showDepartmentError}
+            isValid={isDepartmentValid}
+            {...register('department')}
+          />
+          <TextField
+            label="전화번호"
+            type="tel"
+            inputMode="numeric"
+            maxLength={11}
+            autoComplete="tel"
+            aria-label="전화번호 11자리를 입력하세요"
+            aria-required="true"
+            aria-invalid={!!showPhoneNumberError}
+            aria-describedby={showPhoneNumberError ? 'phoneNumber-error' : undefined}
+            error={showPhoneNumberError}
+            isValid={isPhoneNumberValid}
+            {...register('phoneNumber')}
           />
         </div>
 
