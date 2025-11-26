@@ -1,28 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import Carousel, { CarouselCard } from '@/components/Carousel';
-import InvestmentBottomSheet from '@/components/BottomSheet/Investment/InvestmentBottomSheet';
-import { sampleTeams, TeamDetail } from '@/constants/teamData';
-
-const sampleCards: CarouselCard[] = sampleTeams.map((team) => ({
-  id: team.id,
-  title: team.title,
-  members: team.members,
-  totalInvestment: team.totalInvestment,
-}));
+import Carousel from '@/components/Carousel';
+import { sampleCards } from '@/constants/carouselSampleCards';
 
 export default function CarouselExamplePage() {
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<TeamDetail | null>(null);
-
-  const handleCardClick = (teamId: number) => {
-    const team = sampleTeams.find((t) => t.id === teamId);
-    if (team) {
-      setSelectedTeam(team);
-      setIsBottomSheetOpen(true);
-    }
-  };
   return (
     <div className="min-h-screen bg-black p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -30,7 +11,7 @@ export default function CarouselExamplePage() {
         <div className="mb-12">
           <h2 className="text-white text-lg md:text-xl mb-4">데스크톱 뷰</h2>
           <div className="bg-gray-900 p-6 rounded-lg">
-            <Carousel cards={sampleCards} onCardClick={handleCardClick} /></div>
+            <Carousel cards={sampleCards} /></div>
         </div>
         <div className="mb-12">
           <h2 className="text-white text-lg md:text-xl mb-4">모바일 화면 미리보기</h2>
@@ -41,7 +22,7 @@ export default function CarouselExamplePage() {
                 <div className="bg-black rounded-[30px] overflow-hidden" style={{ height: '600px' }}>
                   <div className="p-6">
                     <div className="text-white text-xl font-bold mb-4">모바일 뷰</div>
-                    <Carousel cards={sampleCards} onCardClick={handleCardClick} />
+                    <Carousel cards={sampleCards} />
                   </div>
                 </div>
               </div>
@@ -52,7 +33,7 @@ export default function CarouselExamplePage() {
                 <div className="bg-black rounded-[15px] overflow-hidden" style={{ height: '600px' }}>
                   <div className="p-8">
                     <div className="text-white text-2xl font-bold mb-6">태블릿 뷰</div>
-                    <Carousel cards={sampleCards} onCardClick={handleCardClick} />
+                    <Carousel cards={sampleCards} />
                   </div>
                 </div>
               </div>
@@ -69,7 +50,7 @@ export default function CarouselExamplePage() {
               <li>🔘 인디케이터 (현재 위치 표시)</li>
               <li>📐 반응형 레이아웃</li>
               <li>♿ 접근성 향상 (ARIA)</li>
-              <li>➡️ Send 아이콘 클릭 → BottomSheet 열기</li>
+              <li>➡️ 카드 스냅 스크롤 및 상태 표현</li>
             </ul>
           </div>
           <div className="bg-gray-900 p-6 rounded-lg">
@@ -91,15 +72,29 @@ export default function CarouselExamplePage() {
           </div>
         </div>
       </div>
-      {selectedTeam && (
-        <InvestmentBottomSheet
-          isOpen={isBottomSheetOpen}
-          onClose={() => setIsBottomSheetOpen(false)}
-          totalInvestment={selectedTeam.totalInvestment}
-          pdfUrls={selectedTeam.pdfUrls}
-          comments={selectedTeam.comments}
-        />
-      )}
     </div>
   );
 }
+
+/* BAK: BottomSheet 연동 시 참고용 코드
+const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+const [selectedTeam, setSelectedTeam] = useState<TeamDetail | null>(null);
+
+const handleCardClick = (teamId: number) => {
+  const team = sampleTeams.find((t) => t.id === teamId);
+  if (team) {
+    setSelectedTeam(team);
+    setIsBottomSheetOpen(true);
+  }
+};
+
+{selectedTeam && (
+  <InvestmentBottomSheet
+    isOpen={isBottomSheetOpen}
+    onClose={() => setIsBottomSheetOpen(false)}
+    totalInvestment={selectedTeam.totalInvestment}
+    pdfUrls={selectedTeam.pdfUrls}
+    comments={selectedTeam.comments}
+  />
+)}
+*/

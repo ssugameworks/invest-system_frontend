@@ -4,7 +4,7 @@
   /* Background Colors */
   --color-background: #141414;
   --color-background-outer: #0a0a0a;
-  --color-background-card: #282828;
+  --color-background-card: #050D18;
   --color-background-bottom-sheet: #2d2d2d;
   --color-background-placeholder: #d9d9d9;
 
@@ -31,6 +31,54 @@
 
   /* Foreground */
   --color-foreground: #171717;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-background-card);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.main_content {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 1rem;
+}
+
+@media screen and (min-width: 840px) {
+  .main_content {
+    position: relative;
+    max-width: 840px;
+    min-height: 100vh;
+  }
+
+  .main_content:before {
+    content: ' ';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    border-left: 0.5px solid;
+    border-color: #888888;
+  }
+
+  .main_content:after {
+    content: ' ';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    bottom: 0;
+    border-right: 0.5px solid;
+    border-color: #888888;
+  }
+
+  div {
+    display: block;
+  }
 }
 
 @utility font-h1-22 {
