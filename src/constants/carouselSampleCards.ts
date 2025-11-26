@@ -9,7 +9,7 @@ export const sampleCards: CarouselCard[] = [
     id: sampleTeams[0].id,
     title: sampleTeams[0].title,
     subtitle: '3주',
-    isInvested: true,
+    isInvested: false,
     totalInvestment: 20000,
     changeAmount: 5000,
     changeRate: 5.8,

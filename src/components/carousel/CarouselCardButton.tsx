@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { formatNumberWithCommas } from '@/utils/formatters';
 import { CarouselCard, GlowVariant } from '@/types/carousel';
 
@@ -37,10 +38,12 @@ const buildChangeLabel = (
 interface CarouselCardButtonProps {
   card: CarouselCard;
   onClick?: (cardId: number) => void;
+  isInvestedState?: boolean;
 }
 
-export function CarouselCardButton({ card, onClick }: CarouselCardButtonProps) {
-  const isInvested = Boolean(card.isInvested);
+export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselCardButtonProps) {
+  const router = useRouter();
+  const isInvested = typeof isInvestedState === 'boolean' ? isInvestedState : Boolean(card.isInvested);
   const avatarLabel = card.avatarLabel ?? (card.title?.[0] ?? '').toUpperCase();
   const glowVariant = card.glowVariant ?? 'bright';
   const changeDirection =
@@ -49,21 +52,17 @@ export function CarouselCardButton({ card, onClick }: CarouselCardButtonProps) {
   const changeText = card.changeLabel ?? buildChangeLabel(card.changeAmount, card.changeRate, changeDirection);
   const showChange = Boolean(changeText);
   const changeColor = changeDirection === 'down' ? 'text-[#d34250]' : 'text-[#5F79FB]';
-  const isInteractive = typeof onClick === 'function';
 
   const handleClick = () => {
-    if (isInteractive) {
-      onClick?.(card.id);
-    }
+    onClick?.(card.id);
+    router.push(`/detail/${encodeURIComponent(card.title)}`);
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={!isInteractive}
-      aria-disabled={!isInteractive}
-      className="relative flex w-full items-center gap-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F6F631] disabled:cursor-default"
+      className="relative flex w-full items-center gap-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F6F631]"
       aria-label={`${card.title} 카드`}
     >
       <div className="relative flex items-center justify-center">
@@ -77,30 +76,19 @@ export function CarouselCardButton({ card, onClick }: CarouselCardButtonProps) {
       </div>
       <div className="flex flex-1 items-center justify-between gap-6 min-w-0">
         <div
-          className={`min-w-0 flex flex-col ${
-            isInvested ? 'items-start' : 'items-center text-center justify-center'
-          } gap-0.5`}
+          className={`min-w-0 flex flex-col ${isInvested ? 'items-start' : 'items-center text-center justify-center'} `}
         >
-          <p className={`${isInvested ? 'text-sm font-medium' : 'text-base font-semibold'} text-[#d2d2d2] truncate`}>{card.title}</p>
-          {isInvested ? (
-            (card.subtitle ?? card.members) && (
-              <p className="text-lg font-semibold text-white truncate" aria-label="투자 기간">
-                {card.subtitle ?? card.members}
-              </p>
-            )
-          ) : (
-            <>
-              {card.members && (
-                <p className="text-sm font-medium text-[#9ca0ab] truncate" aria-label="팀 구성원">
-                  {card.members}
-                </p>
-              )}
-              {card.subtitle && (
-                <p className="text-lg font-semibold text-white truncate" aria-label="활동 정보">
-                  {card.subtitle}
-                </p>
-              )}
-            </>
+          <p
+            className={`${
+              isInvested ? 'text-base font-semibold text-[#d2d2d2] ' : 'text-[20px] font-semibold text-white'
+            } truncate`}
+          >
+            {card.title}
+          </p>
+          {isInvested && card.subtitle && (
+            <p className="text-xl font-semibold text-white truncate " aria-label="투자양">
+              {card.subtitle}
+            </p>
           )}
         </div>
         <div className="text-right min-w-[120px]">

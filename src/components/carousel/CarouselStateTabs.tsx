@@ -3,28 +3,29 @@ import { CarouselState } from '@/types/carousel';
 
 interface CarouselStateTabsProps {
   activeState: CarouselState | null;
-  stateGroupIndices: Partial<Record<CarouselState, number>>;
   onStateSelect: (state: CarouselState) => void;
+  tabs: Array<{ state: CarouselState; hasItems: boolean }>;
 }
 
-export function CarouselStateTabs({ activeState, stateGroupIndices, onStateSelect }: CarouselStateTabsProps) {
+export function CarouselStateTabs({ activeState, onStateSelect, tabs }: CarouselStateTabsProps) {
+  const tabMap = new Map(tabs.map((tab) => [tab.state, tab]));
+
   return (
     <div className="flex items-center gap-2 mb-3" role="tablist" aria-label="캐러셀 상태">
       {STATE_ORDER.map((state) => {
         const isActive = activeState ? activeState === state : state === 'invested';
-        const isAvailable = typeof stateGroupIndices[state] === 'number';
+        const hasItems = tabMap.get(state)?.hasItems ?? false;
 
         return (
           <button
             key={state}
             type="button"
-            onClick={() => isAvailable && onStateSelect(state)}
-            disabled={!isAvailable}
+            onClick={() => onStateSelect(state)}
             role="tab"
             aria-selected={isActive}
             className={`bg-transparent border-0 p-0 text-base font-semibold transition-colors ${
-              isAvailable ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'
-            } ${isActive ? 'text-white font-bold' : 'text-[#888888]'}`}
+              isActive ? 'text-white font-bold' : 'text-[#888888]'
+            } ${hasItems ? '' : 'opacity-70'}`}
           >
             {STATE_LABELS[state]}
           </button>
