@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, RefObject } from 'react';
 
 const DRAG_SPEED_MULTIPLIER = 1.5;

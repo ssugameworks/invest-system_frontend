@@ -55,20 +55,20 @@ export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselC
 
   const handleClick = () => {
     onClick?.(card.id);
-    router.push(`/detail/${encodeURIComponent(card.title)}`);
+    router.push(`/detail/${card.id}`);
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      className="relative flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left transform-gpu bg-transparent transition duration-200 ease-out hover:-translate-y-[2px] hover:bg-white/5 active:translate-y-0 active:scale-[0.96] active:bg-white/10 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#F6F631]"
+      className="relative flex w-full items-center gap-4 rounded-2xl px-1 py-3 text-left transform-gpu bg-transparent transition duration-200 ease-out hover:-translate-y-[2px] hover:bg-white/5 active:translate-y-0 active:scale-[0.96] active:bg-white/10 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#F6F631]"
       aria-label={`${card.title} 카드`}
     >
       <div className="relative flex items-center justify-center">
         <span aria-hidden className="pointer-events-none absolute -inset-3 -z-10 blur-[22px]" style={AVATAR_GLOW_STYLES[glowVariant]} />
         <div
-          className="flex size-12 items-center justify-center rounded-full text-xl font-bold text-black"
+          className="flex size-11 items-center justify-center rounded-full text-xl font-bold text-black"
           style={{ backgroundColor: card.avatarBackground ?? '#FFFFFF' }}
         >
           {avatarLabel}
@@ -80,7 +80,7 @@ export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselC
         >
           <p
             className={`${
-              isInvested ? 'text-base font-semibold text-[#d2d2d2] ' : 'text-[20px] font-semibold text-white'
+              isInvested ? 'text-base font-semibold text-[#d2d2d2] ' : 'ml-auto text-xl xs:text-lg font-semibold text-white'
             } truncate`}
           >
             {card.title}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import GameworksLogo from '@/assets/icons/gameworks-logo.svg';
+import gameworksLogo from '@/assets/icons/gameworks-logo.webp';
 
 type HeaderProps = {
   label?: string;
@@ -57,11 +58,11 @@ export default function Header({
 
   return (
     <header
-      className={`flex items-center gap-1 px-2  text-white ${className}`}
+      className={`flex w-full items-center justify-center gap-1  text-white ${className}`}
       aria-label={`${label} 헤더`}
       data-node-id="4595:326"
     >
-      <GameworksLogo aria-hidden="true" focusable="false" />
+        <img src={gameworksLogo.src} alt="Gameworks Logo" className="w-[1.375rem]"></img>
       
     </header>
   );

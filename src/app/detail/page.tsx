@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { DEFAULT_TEAM_NAME } from './detailData';
 
 export default function DetailPage() {
-  redirect(`/detail/${encodeURIComponent(DEFAULT_TEAM_NAME)}`);
+  // detail 페이지는 팀 ID가 필요하므로 main 페이지로 리다이렉트
+  redirect('/main');
 }

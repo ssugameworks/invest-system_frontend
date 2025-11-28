@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  FALLBACK_RECENT_COMMENTS_RESULT,
-  fetchRecentComments,
-  type RecentCommentsResult,
-} from '@/api/api';
-import type { Comment } from '@/types/bottomSheet';
+import { fetchRecentComments, type RecentCommentsResult } from '@/lib/api/chat';
 import { useRouter } from 'next/navigation';
 
 type LiveChatPreviewProps = {
@@ -15,9 +10,14 @@ type LiveChatPreviewProps = {
 
 const REFRESH_INTERVAL = 30_000;
 
+const FALLBACK_COMMENTS_RESULT: RecentCommentsResult = {
+  comments: [],
+  totalCount: 0,
+};
+
 export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps) {
   const [commentsState, setCommentsState] = useState<RecentCommentsResult>(
-    FALLBACK_RECENT_COMMENTS_RESULT,
+    FALLBACK_COMMENTS_RESULT,
   );
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -93,22 +93,12 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
   );
 }
 
-function formatAuthor(comment?: Comment): string {
+function formatAuthor(comment?: { nickname: string; department: string }): string {
   if (!comment) {
     return '익명의 투자자';
   }
 
-  const maskedId = maskStudentId(comment.studentId);
-  return `${comment.nickname} (${maskedId})`;
-}
-
-function maskStudentId(studentId: number): string {
-  const digits = Math.abs(Math.trunc(studentId)).toString();
-  if (digits.length <= 2) {
-    return 'XX';
-  }
-
-  return `${digits.slice(0, -2)}XX`;
+  return `${comment.nickname} · ${comment.department}`;
 }
 
 function formatCommentTime(value?: string | Date): string {
