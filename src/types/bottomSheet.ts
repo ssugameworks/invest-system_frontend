@@ -3,7 +3,7 @@ export interface Comment {
   nickname: string;
   studentId: number;
   content: string;
-  createdAt?: Date;
+  createdAt?: string | Date;
 }
 
 export interface BottomSheetProps {

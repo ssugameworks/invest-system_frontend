@@ -3,7 +3,7 @@
 import { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'disabled';
+  variant?: 'primary' | 'secondary' | 'disabled' | 'sell' | 'buy';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -22,6 +22,8 @@ export default function Button({
     primary: 'bg-accent-yellow text-background-card shadow-[0px_0px_15px_0px_#efff8f] hover:opacity-90',
     secondary: 'bg-accent-green text-[#282828] hover:opacity-90',
     disabled: 'cursor-not-allowed bg-[#c4c4c4] text-white',
+    sell: 'bg-[#d34250] text-white shadow-[0_8px_18px_rgba(211,66,80,0.35)] hover:brightness-110',
+    buy: 'bg-[#5f79fb] text-white shadow-[0_8px_18px_rgba(95,121,251,0.35)] hover:brightness-110',
   };
 
   const sizeStyles = {

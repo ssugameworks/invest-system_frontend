@@ -3,7 +3,7 @@ import { CarouselGroup } from '@/types/carousel';
 import { CarouselCardButton } from '@/components/carousel/CarouselCardButton';
 
 const MAX_VISIBLE_CARDS = 4;
-const MAX_LIST_HEIGHT_PX = 320;
+const MAX_LIST_HEIGHT_PX = 300;
 
 interface CarouselGroupSlideProps {
   group: CarouselGroup;

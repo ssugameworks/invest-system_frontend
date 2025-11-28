@@ -11,7 +11,7 @@ export function CarouselStateTabs({ activeState, onStateSelect, tabs }: Carousel
   const tabMap = new Map(tabs.map((tab) => [tab.state, tab]));
 
   return (
-    <div className="flex items-center gap-2 mb-3" role="tablist" aria-label="캐러셀 상태">
+    <div className="flex items-center gap-2 " role="tablist" aria-label="캐러셀 상태">
       {STATE_ORDER.map((state) => {
         const isActive = activeState ? activeState === state : state === 'invested';
         const hasItems = tabMap.get(state)?.hasItems ?? false;

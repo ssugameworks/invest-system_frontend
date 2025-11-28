@@ -94,7 +94,7 @@ export default function Carousel({ cards, className = '', onCardClick }: Carouse
   const missingStates = tabs.filter((tab) => !tab.hasItems).map((tab) => tab.state);
 
   return (
-    <div className={`w-full px-4 md:px-0 py-3 ${className}`}>
+    <div className={`w-full md:px-0 py-3 ${className}`}>
       <CarouselStateTabs activeState={activeState} onStateSelect={handleStateClick} tabs={tabs} />
 
     
