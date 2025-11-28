@@ -62,7 +62,7 @@ export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselC
     <button
       type="button"
       onClick={handleClick}
-      className="relative flex w-full items-center gap-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F6F631]"
+      className="relative flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left transform-gpu bg-transparent transition duration-200 ease-out hover:-translate-y-[2px] hover:bg-white/5 active:translate-y-0 active:scale-[0.96] active:bg-white/10 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#F6F631]"
       aria-label={`${card.title} 카드`}
     >
       <div className="relative flex items-center justify-center">

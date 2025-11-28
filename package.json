@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .js,.ts,.tsx && prettier --check ."
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@hookform/resolvers": "^5.2.2",
     "next": "15.5.3",
     "react": "19.1.0",

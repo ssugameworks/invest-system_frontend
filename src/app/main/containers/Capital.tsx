@@ -10,7 +10,7 @@ export default async function Capital({ className = '' }: CapitalProps) {
 
   return (
     <section
-      className={`flex w-full flex-col items-center justify-center  text-center ${className}`}
+      className={`flex w-full flex-col items-center justify-center  text-center transform translate-y-[50px] z-100 ${className}`}
       aria-label="보유 현금"
       aria-live="polite"
       data-node-id="4377:2167"

@@ -10,8 +10,8 @@ export default async function InvestmentTrendSection() {
   const points = await loadInvestmentTrend();
 
   return (
-    <section className="flex flex-col  w-full justify-center " aria-label="실시간 투자 추이">
-    <Capital />
+    <section className="flex w-full flex-col justify-center gap-4" aria-label="실시간 투자 추이">
+      <Capital />
       <InvestmentTrendChart points={points} />
     </section>
   );

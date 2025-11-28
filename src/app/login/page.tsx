@@ -3,8 +3,8 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/Button';
+import Header from '@/components/Header';
 import TextField from '@/components/TextField';
-import GameworksLogo from '@/assets/icons/gameworks-logo.svg';
 import { loginSchema, type LoginFormData } from '@/schemas/auth.schema';
 
 export default function LoginPage() {
@@ -43,13 +43,8 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-full h-screen bg-background-card overflow-hidden">
-      {/* GAMEWORKS Logo */}
-      <div className="absolute left-7 top-9 flex items-center gap-1">
-        <GameworksLogo className="w-[1.125rem] h-[1.0625rem]" />
-        <p className="font-pretendard font-semibold text-14 text-white leading-none">
-          GAMEWORKS
-        </p>
-      </div>
+      {/* GAMEWORKS Header */}
+      <Header className="absolute left-7 top-9" />
 
       {/* Title Section */}
       <div className="absolute left-1/2 top-36 -translate-x-1/2 w-[19.75rem] flex flex-col gap-2.5 items-center text-center">
