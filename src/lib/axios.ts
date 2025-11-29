@@ -100,7 +100,7 @@ axiosInstance.interceptors.response.use(
     }
 
     // 🔒 500 Internal Server Error
-    if (error.response?.status >= 500) {
+    if (error.response?.status && error.response.status >= 500) {
       console.error('🔥 서버 에러가 발생했습니다.');
       
       // 운영 환경에서는 사용자에게 친절한 에러 메시지 표시
