@@ -112,7 +112,7 @@ axiosInstance.interceptors.response.use(
 
     // 에러 메시지 추출 (안전하게)
     const errorMessage =
-      (error.response?.data as any)?.message ||
+      (error.response?.data as { message?: string })?.message ||
       error.message ||
       '알 수 없는 오류가 발생했습니다.';
 

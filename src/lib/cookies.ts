@@ -101,7 +101,7 @@ export const cookieManager = {
   /**
    * 🔒 토큰 디코딩 (payload 정보 가져오기)
    */
-  decodeToken: (): any | null => {
+  decodeToken: (): Record<string, unknown> | null => {
     const token = cookieManager.getToken();
     
     if (!token) {

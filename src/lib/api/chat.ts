@@ -38,7 +38,7 @@ export const fetchRecentComments = async (
   limit: number = 10,
   cursor?: number,
 ): Promise<RecentCommentsResult> => {
-  const params: any = { limit };
+  const params: Record<string, number> = { limit };
   if (cursor) {
     params.cursor = cursor;
   }
