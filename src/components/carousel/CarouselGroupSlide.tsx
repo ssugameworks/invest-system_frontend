@@ -3,7 +3,7 @@ import { CarouselGroup } from '@/types/carousel';
 import { CarouselCardButton } from '@/components/carousel/CarouselCardButton';
 
 const MAX_VISIBLE_CARDS = 4;
-const MAX_LIST_HEIGHT_PX = 320;
+const MAX_LIST_HEIGHT_PX = 300;
 
 interface CarouselGroupSlideProps {
   group: CarouselGroup;
@@ -18,7 +18,7 @@ export function CarouselGroupSlide({ group, onCardClick, emptyMessage }: Carouse
   return (
     <div data-carousel-item className="flex-none w-full max-w-[840px]" style={{ scrollSnapAlign: 'start' }}>
       <div
-        className={`h-full w-full py-6 flex flex-col gap-6 ${
+        className={`h-full w-full py-2 flex flex-col gap-2 ${
           enableOverflow ? 'overflow-y-auto pr-2 scrollbar-hide' : ''
         }`}
         style={listStyle}

@@ -17,7 +17,7 @@ export function extractNumbers(value: string): string {
  * @returns 천단위 콤마가 추가된 문자열
  */
 export function formatNumberWithCommas(value: string | number): string {
-  if (!value) return '';
+  if (value === null || value === undefined || value === '') return '';
   const stringValue = String(value);
   return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

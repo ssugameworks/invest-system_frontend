@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import ReduxProvider from '@/providers/ReduxProvider';
+import QueryProvider from '@/providers/QueryProvider';
 
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.woff2',
@@ -23,7 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={pretendard.variable}>
       <body className={`${pretendard.className} antialiased`}>
-        <main className="main_content">{children}</main>
+        <ReduxProvider>
+          <QueryProvider>
+            <main className="main_content">{children}</main>
+          </QueryProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
