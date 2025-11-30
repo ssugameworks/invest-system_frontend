@@ -128,7 +128,7 @@ export const cookieManager = {
   getTokenExpiresIn: (): number | null => {
     const payload = cookieManager.decodeToken();
     
-    if (!payload || !payload.exp) {
+    if (!payload || !payload.exp || typeof payload.exp !== 'number') {
       return null;
     }
 

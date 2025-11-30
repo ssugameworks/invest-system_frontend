@@ -59,15 +59,16 @@ export default function MainPage() {
 
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center bg-background-card px-3">
-      <Header className="absolute top-4 z-50" />
       <div className="flex flex-col gap-4 justify-center items-center w-full">
         <InvestmentTrendSection />
-        {isLoading ? (
+        {isLoading ? ( 
           <div className="text-text-secondary text-sm">팀 목록을 불러오는 중...</div>
         ) : (
           <Carousel cards={cards} />
         )}
         <LiveChatPreview />
+        <Header />
+        <div></div>
       </div>
     </div>
   );

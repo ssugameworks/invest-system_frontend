@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import { signUpSchema, type SignUpFormData } from '@/schemas/auth.schema';
@@ -131,21 +132,70 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-full h-screen bg-background-card overflow-hidden">
-      {/* Title Section */}
-      <div className="absolute left-1/2 top-36 -translate-x-1/2 w-[19.75rem] flex flex-col gap-2.5 items-center text-center">
-        <h1 className="font-pretendard font-semibold text-[1.75rem] text-accent-yellow leading-normal animate-neon-glow">
-          FLOW : Startup Bridge
-        </h1>
-        <p className="font-pretendard font-light text-18 text-text-secondary leading-normal">
-          The more you explore, the smarter your
-          <br />
-          dashboard becomes
-        </p>
-      </div>
+      {/* Hero Section */}
+      <header className="absolute top-0 left-0 right-0 h-[50vh] sm:h-[55vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 overflow-hidden pointer-events-none">
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 space-y-3 sm:space-y-4"
+        >
+          <motion.p
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+            className="text-accent-yellow text-xs sm:text-sm md:text-base font-mono tracking-[0.3em] sm:tracking-[0.5em] uppercase mb-2 sm:mb-4"
+          >
+            2025.12.19 19:00 KST
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[10vw] sm:text-[12vw] md:text-[8vw] leading-[0.9] font-pretendard font-bold uppercase text-white tracking-tighter relative z-20"
+          >
+            <motion.span
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              FLOW : <br/>
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-transparent"
+              style={{ WebkitTextStroke: '1px rgba(255, 255, 255, 0.3)' }}
+            >
+              Startup
+            </motion.span>
+            {' '}
+            <motion.span
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="text-accent-yellow"
+              style={{ textShadow: '0 0 30px rgba(239, 255, 143, 0.6)' }}
+            >
+              Bridge
+            </motion.span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
+            className="text-base sm:text-lg md:text-2xl font-light text-text-secondary tracking-widest uppercase mt-4 sm:mt-8 relative z-20 px-2"
+          >
+                                                The Wave of Innovation
+
+          </motion.p>
+        </motion.div>
+      </header>
 
       <form onSubmit={handleSubmit(onSubmit)} aria-label={isLoginMode ? '로그인 폼' : '회원가입 폼'}>
         {/* Input Fields */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[20.25rem] w-[19.6875rem] flex flex-col gap-4 sm:gap-5">
+        <div className="absolute left-1/2 -translate-x-1/2 top-[42vh] sm:top-[47vh] w-[19.6875rem] flex flex-col gap-4 sm:gap-5">
           <TextField
             label="학번"
             type="text"

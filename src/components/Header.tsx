@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import GameworksLogo from '@/assets/icons/gameworks-logo.svg';
-import gameworksLogo from '@/assets/icons/gameworks-logo.webp';
+import gameworksLogo from '@/assets/icons/gameworksLogo.png';
+import spartanLogo from '@/assets/icons/spartanLogo.png';
 
 type HeaderProps = {
   label?: string;
@@ -58,12 +58,25 @@ export default function Header({
 
   return (
     <header
-      className={`flex w-full items-center justify-center gap-1  text-white ${className}`}
+      className={`flex w-full items-center justify-center gap-2 text-white ${className}`}
       aria-label={`${label} 헤더`}
       data-node-id="4595:326"
     >
-        <img src={gameworksLogo.src} alt="Gameworks Logo" className="w-[1.375rem]"></img>
+      {/* GAMEWORKS Logo */}
+      <img 
+        src={gameworksLogo.src} 
+        alt="GAMEWORKS" 
+        className="h-5 sm:h-9 w-28 object-contain"
+      />
       
+      {/* Soongsil University Logo */}
+      <div className="flex items-center gap-2.5 border-l border-white/20 pl-4">
+        <img 
+          src={spartanLogo.src} 
+          alt="숭실대학교 스파르탄SW교육원" 
+          className="h-12 sm:h-9 w-auto object-contain"
+        />
+      </div>
     </header>
   );
 }

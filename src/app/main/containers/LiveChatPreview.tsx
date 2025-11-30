@@ -9,6 +9,7 @@ type LiveChatPreviewProps = {
 };
 
 const REFRESH_INTERVAL = 30_000;
+const ROTATE_INTERVAL = 5_000;
 
 const FALLBACK_COMMENTS_RESULT: RecentCommentsResult = {
   comments: [],
@@ -20,6 +21,7 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
     FALLBACK_COMMENTS_RESULT,
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,15 +45,29 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
     };
 
     refreshComments();
-    const intervalId = setInterval(refreshComments, REFRESH_INTERVAL);
+    const refreshIntervalId = setInterval(refreshComments, REFRESH_INTERVAL);
 
     return () => {
       isMounted = false;
-      clearInterval(intervalId);
+      clearInterval(refreshIntervalId);
     };
   }, []);
 
-  const highlightComment = commentsState.comments[0];
+  // 5초마다 댓글 rotate
+  useEffect(() => {
+    if (commentsState.comments.length <= 1) {
+      setCurrentIndex(0);
+      return;
+    }
+
+    const rotateIntervalId = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % commentsState.comments.length);
+    }, ROTATE_INTERVAL);
+
+    return () => clearInterval(rotateIntervalId);
+  }, [commentsState.comments.length]);
+
+  const highlightComment = commentsState.comments[currentIndex];
   const totalCount = commentsState.totalCount ?? commentsState.comments.length;
   const message =
     highlightComment?.content ??
@@ -60,7 +76,7 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
 
   return (
     <section
-      className={`flex w-full flex-col gap-2 rounded-2xl border border-border-card/50 bg-background-card/40 px-4 py-3 ${className}`}
+      className={`flex w-full flex-col gap-2 rounded-2xl border border-border-card/50 bg-background-card/40 px-4 py-3 mb-2 ${className}`}
       aria-label="실시간 채팅"
       aria-live="polite"
       data-node-id="4377:2096"

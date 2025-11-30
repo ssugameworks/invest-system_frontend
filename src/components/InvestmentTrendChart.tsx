@@ -182,12 +182,13 @@ export default function InvestmentTrendChart({ points, className = '' }: Investm
             </linearGradient>
 
             <linearGradient id={areaGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E7FA4F" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#050D18" stopOpacity="0" />
+              <stop offset="0%" stopColor="#F8FFCF" stopOpacity="0.55" />
+              <stop offset="60%" stopColor="#EFFF8F" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#EFFF8F" stopOpacity="0" />
             </linearGradient>
 
-            <filter id={glowFilterId} x="-15%" y="-25%" width="140%" height="180%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+            <filter id={glowFilterId} x="-20%" y="-30%" width="150%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -212,8 +213,8 @@ export default function InvestmentTrendChart({ points, className = '' }: Investm
                   stroke={`url(#${lineGradientId})`}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  opacity={0.65}
+                  strokeWidth={3}
+                  opacity={0.9}
                   filter={`url(#${glowFilterId})`}
                   aria-hidden="true"
                 />
@@ -224,32 +225,10 @@ export default function InvestmentTrendChart({ points, className = '' }: Investm
                   stroke="#EFFF8F"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={3}
                   aria-hidden="true"
                 />
               </g>
-
-              {displayCoordinate && valueLabel && (
-                <>
-                  <circle
-                    cx={displayCoordinate.x}
-                    cy={displayCoordinate.y}
-                    r={POINT_GLOW_RADIUS}
-                    fill="rgba(239, 255, 143, 0.25)"
-                    aria-hidden="true"
-                  />
-                  <circle
-                    cx={displayCoordinate.x}
-                    cy={displayCoordinate.y}
-                    r={POINT_RADIUS}
-                    fill="#EFFF8F"
-                    stroke="#EFFF8F"
-                    strokeWidth={0.3}
-                    aria-label="현재 시점"
-                  />
-                 
-                </>
-              )}
             </>
           ) : (
             <text
