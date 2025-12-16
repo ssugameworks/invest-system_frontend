@@ -19,7 +19,6 @@ export default function BottomSheetBase({
   height = 'h-[43.75rem]',
   ariaLabel = '바텀시트',
 }: BottomSheetBaseProps) {
-  // ESC 키로 바텀시트 닫기
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isAnimating) {
@@ -29,7 +28,6 @@ export default function BottomSheetBase({
 
     if (isAnimating) {
       document.addEventListener('keydown', handleEscape);
-      // 바텀시트 열릴 때 body 스크롤 방지
       document.body.style.overflow = 'hidden';
     }
 

@@ -1,7 +1,7 @@
 import type { Comment } from '@/types/bottomSheet';
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? '';
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? 'http://localhost:3001';
 
 type RequestOptions = RequestInit & {
   skipBaseUrl?: boolean;
@@ -283,8 +283,7 @@ export async function fetchRecentComments(options?: {
     if (normalized.comments.length) {
       return normalized;
     }
-  } catch (error) {
-    console.error('[api] 실시간 댓글 로딩 실패', error);
+  } catch {
   }
 
   return FALLBACK_RECENT_COMMENTS_RESULT;

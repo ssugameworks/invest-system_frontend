@@ -22,8 +22,8 @@ export default function Button({
     primary: 'bg-accent-yellow text-background-card shadow-[0px_0px_15px_0px_#efff8f] hover:opacity-90 hover:shadow-[0px_0px_20px_0px_#efff8f]',
     secondary: 'bg-accent-green text-[#282828] hover:opacity-90 shadow-md active:shadow-sm',
     disabled: 'cursor-not-allowed bg-[#c4c4c4] text-white active:scale-100',
-    sell: 'bg-[#d34250] text-white shadow-[0_8px_18px_rgba(211,66,80,0.35)] hover:brightness-110 hover:shadow-[0_10px_20px_rgba(211,66,80,0.45)]',
-    buy: 'bg-[#5f79fb] text-white shadow-[0_8px_18px_rgba(95,121,251,0.35)] hover:brightness-110 hover:shadow-[0_10px_20px_rgba(95,121,251,0.45)]',
+    sell: 'bg-[#5f79fb] text-white shadow-[0_8px_18px_rgba(95,121,251,0.35)] hover:brightness-110 hover:shadow-[0_10px_20px_rgba(95,121,251,0.45)]',
+    buy: 'bg-[#d34250] text-white shadow-[0_8px_18px_rgba(211,66,80,0.35)] hover:brightness-110 hover:shadow-[0_10px_20px_rgba(211,66,80,0.45)]',
   };
 
   const sizeStyles = {

@@ -20,20 +20,17 @@ export default function CommentsContainer({
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<number | null>(null);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserId = async () => {
       try {
         const userInfo = await getMyInfo();
         setUserId(userInfo.id);
-      } catch (error) {
-        console.error('사용자 정보 가져오기 실패:', error);
+      } catch {
       }
     };
     fetchUserId();
   }, []);
 
-  // 댓글 로드
   useEffect(() => {
     const loadComments = async () => {
       try {
@@ -44,18 +41,16 @@ export default function CommentsContainer({
           limit: showAll ? 50 : 3,
         });
 
-        // 백엔드 응답을 프론트엔드 타입으로 변환
         const transformedComments: Comment[] = response.items.map((item) => ({
           id: item.id,
-          nickname: `사용자${item.author_id}`, // TODO: 백엔드에서 사용자 이름 조인 필요
+          nickname: `사용자${item.author_id}`,
           studentId: item.author_id,
           content: item.body,
           createdAt: item.created_at,
         }));
 
         setComments(transformedComments);
-      } catch (error) {
-        console.error('댓글 로딩 실패:', error);
+      } catch {
         setComments([]);
       } finally {
         setIsLoading(false);
@@ -77,7 +72,6 @@ export default function CommentsContainer({
         body: commentText,
       });
 
-      // 댓글 새로고침
       const response = await getTeamComments({
         teamId,
         mode: showAll ? 'default' : 'preview',

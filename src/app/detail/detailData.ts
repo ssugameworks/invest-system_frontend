@@ -1,6 +1,7 @@
 import { FALLBACK_TREND_POINTS, type InvestmentTrendPoint } from '@/api/api';
 import type { TeamMember } from './containers/MemberSpotlight';
 import type { PresentationDocument } from './containers/PresentationMaterials';
+import { getTeamMemberImage } from '@/utils/teamLogos';
 
 export const DEFAULT_TEAM_NAME = '일식이조아';
 
@@ -19,11 +20,7 @@ export type TeamDetailContent = {
 
 type TeamDetailPreset = Omit<TeamDetailContent, 'name'>;
 
-const AVATAR_IMAGES = [
-  'http://localhost:3845/assets/4c4ac2c57344696890fcb285541151278657cd39.png',
-  'http://localhost:3845/assets/e7081910be6a9f45db2f8082138f7ae044b638c8.png',
-  'http://localhost:3845/assets/dcf534a53a49035b3bfb23403a5cc24c4e438325.png',
-];
+const AVATAR_IMAGES: string[] = [];
 
 const MEMBER_BLUEPRINT = [
   { role: '리드', department: '글로벌미디어학부' },
@@ -56,9 +53,9 @@ const TEAM_DETAIL_PRESETS: Record<string, TeamDetailPreset> = {
     totalInvestment: 23_450_000,
     refreshSeconds: 8,
     members: [
-      { id: 1, name: '편유나', department: '글로벌미디어학부', avatar: AVATAR_IMAGES[0] },
-      { id: 2, name: '김민규', department: '글로벌미디어학부', avatar: AVATAR_IMAGES[1] },
-      { id: 3, name: '이서준', department: '글로벌미디어학부', avatar: AVATAR_IMAGES[2] },
+      { id: 1, name: '정제훈', department: '글로벌미디어학부', avatar: getTeamMemberImage('일식이좋아', '정제훈') },
+      { id: 2, name: '김용기', department: '경영학부', avatar: getTeamMemberImage('일식이좋아', '김용기') },
+      { id: 3, name: '최효우', department: '글로벌미디어학부', avatar: getTeamMemberImage('일식이좋아', '최효우') },
     ],
     documents: DEFAULT_DOCUMENTS,
     availableBudget: 50_000,
@@ -147,12 +144,15 @@ function decodeTeamParam(param?: string): string {
 }
 
 function createMembers(teamName: string): TeamMember[] {
-  return MEMBER_BLUEPRINT.map((blueprint, index) => ({
-    id: index + 1,
-    name: `${teamName} ${blueprint.role}`,
-    department: blueprint.department,
-    avatar: AVATAR_IMAGES[index % AVATAR_IMAGES.length],
-  }));
+  return MEMBER_BLUEPRINT.map((blueprint, index) => {
+    const memberName = `${teamName} ${blueprint.role}`;
+    return {
+      id: index + 1,
+      name: memberName,
+      department: blueprint.department,
+      avatar: getTeamMemberImage(teamName, memberName),
+    };
+  });
 }
 
 function createDocuments(teamName: string): PresentationDocument[] {

@@ -33,10 +33,7 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
         if (isMounted) {
           setCommentsState(next);
         }
-      } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.error('[LiveChatPreview] 댓글 로딩 실패', error);
-        }
+      } catch {
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -53,7 +50,6 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
     };
   }, []);
 
-  // 5초마다 댓글 rotate
   useEffect(() => {
     if (commentsState.comments.length <= 1) {
       setCurrentIndex(0);
@@ -133,4 +129,3 @@ function formatCommentTime(value?: string | Date): string {
     hourCycle: 'h23',
   }).format(date);
 }
-

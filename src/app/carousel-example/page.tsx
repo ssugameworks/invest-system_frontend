@@ -23,9 +23,7 @@ export default function CarouselExamplePage() {
           totalInvestment: team.money || 0,
         }));
         setCards(carouselCards);
-      } catch (error) {
-        console.error('팀 목록 로딩 실패:', error);
-        // 폴백 데이터 사용 (기존 sampleCards)
+      } catch {
         const { sampleCards } = await import('@/constants/carouselSampleCards');
         setCards(sampleCards);
       } finally {

@@ -31,20 +31,20 @@ export default function ChatInputBar({
 
   return (
     <form className={`flex w-full justify-center ${className}`} onSubmit={handleSubmit}>
-      <label className="flex w-full max-w-[353px] items-center gap-3 rounded-[10px] border border-[#434343] bg-[#050d18] px-5 py-2 text-[#888888] focus-within:border-[#efff8f] focus-within:text-white">
+      <label className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-[#151A29] px-5 py-3.5 text-text-secondary backdrop-blur-sm focus-within:border-accent-yellow/40 focus-within:shadow-[0_0_15px_rgba(239,255,143,0.15)] transition-all">
         <input
           type="text"
           name="chat-message"
           placeholder={placeholder}
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          className="w-full bg-transparent text-base text-white placeholder:text-[#88888888] focus:outline-none"
+          className="w-full bg-transparent text-[15px] text-white placeholder:text-text-tertiary focus:outline-none"
         />
         <SendIcon
-          className={`size-10 rounded-full transition-colors duration-150 focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-[#efff8f] ${
+          className={`size-9 rounded-full transition-all duration-200 ${
             isReadyToSend
-              ? ' text-[#efff8f] hover:bg-[#efff8f]/90'
-              : ' text-white'
+              ? 'text-accent-yellow hover:scale-110 hover:drop-shadow-[0_0_8px_rgba(239,255,143,0.6)]'
+              : 'text-text-tertiary opacity-50'
           } flex items-center justify-center`}
           disabled={!isReadyToSend}
           onClick={sendMessage}

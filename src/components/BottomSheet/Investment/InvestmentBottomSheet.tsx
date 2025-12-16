@@ -45,7 +45,7 @@ export default function InvestmentBottomSheet({
   const handlePdfScroll = () => {
     if (pdfScrollRef.current && pdfUrls.length > 0) {
       const scrollLeft = pdfScrollRef.current.scrollLeft;
-      const itemWidth = 188 + 3; // width + gap
+      const itemWidth = 188 + 3;
       const index = Math.round(scrollLeft / itemWidth);
       setCurrentPdfIndex(index);
     }

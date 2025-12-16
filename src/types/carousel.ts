@@ -9,6 +9,7 @@ export interface CarouselCard {
   subtitle?: string;
   isInvested?: boolean;
   totalInvestment: number;
+  currentPrice?: number;
   changeAmount?: number;
   changeRate?: number;
   changeLabel?: string;

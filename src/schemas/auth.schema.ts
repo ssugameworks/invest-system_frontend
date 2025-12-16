@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-/**
- * 회원가입 폼 검증 스키마
- * 백엔드 API와 매핑: studentId -> schoolNumber
- */
 export const signUpSchema = z.object({
   studentId: z
     .string()
@@ -38,12 +34,5 @@ export const signInSchema = z.object({
     .min(6, '비밀번호는 최소 6자 이상이어야 합니다'),
 });
 
-/**
- * 회원가입 폼 데이터 타입
- */
 export type SignUpFormData = z.infer<typeof signUpSchema>;
-
-/**
- * 로그인 폼 데이터 타입
- */
 export type SignInFormData = z.infer<typeof signInSchema>;

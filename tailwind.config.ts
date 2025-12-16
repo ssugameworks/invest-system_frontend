@@ -5,7 +5,7 @@ const config: Config = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     screens: {
-      xs: '375px',
+      xs: '380px',
       sm: '640px',
       md: '768px',
       lg: '1024px',
@@ -87,6 +87,15 @@ const config: Config = {
         'gradient-card': 'linear-gradient(to right, #E7FA4F, #83F055)',
         'gradient-button':
           'linear-gradient(to right, rgba(252, 255, 245, 0.2), rgba(234, 255, 132, 0.2))',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        'shimmer': 'shimmer 1.5s infinite',
       },
     },
   },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { extractNumbers, formatCurrency, formatNumberWithCommas } from '@/utils/formatters';
 import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
@@ -11,12 +12,13 @@ type TradePanelProps = {
   currentPrice: number;
   availableBudget: number;
   ownedShares?: number;
-  ownedAmount?: number; // 보유 주식의 평가액 (매도 시 사용)
+  ownedAmount?: number;
 };
 
 type TradeMode = 'buy' | 'sell' | null;
 
 export default function TradePanel({ teamId, currentPrice, availableBudget, ownedShares = 0, ownedAmount = 0 }: TradePanelProps) {
+  const router = useRouter();
   const [rawAmount, setRawAmount] = useState('');
   const [mode, setMode] = useState<TradeMode>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,8 +28,6 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
   const formattedAmount = rawAmount ? formatNumberWithCommas(rawAmount) : '';
   const numericAmount = rawAmount ? Number(rawAmount) : 0;
   
-  // 매수/매도 모두 주식 개수로 입력
-  // 매수: 주식 개수를 금액으로 환산하여 검증
   const buyAmount = mode === 'buy' ? Math.round(numericAmount * currentPrice) : 0;
   const exceedsBudget = mode === 'buy' && buyAmount > availableBudget;
   const exceedsShares = mode === 'sell' && numericAmount > ownedShares;
@@ -44,10 +44,8 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
 
   const handleSetMaxAmount = () => {
     if (mode === 'sell' && ownedShares > 0) {
-      // 매도: 보유 주식 개수 입력
       setRawAmount(String(Math.round(ownedShares)));
     } else if (mode === 'buy' && availableBudget > 0 && currentPrice > 0) {
-      // 매수: 전체 금액으로 살 수 있는 주식 개수 계산
       const maxShares = Math.floor(availableBudget / currentPrice);
       setRawAmount(String(maxShares));
     }
@@ -58,7 +56,6 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
 
     setIsSubmitting(true);
     try {
-      // 매수/매도 모두 주식 개수를 금액으로 변환하여 전송
       const shares = Math.round(numericAmount);
       const amount = Math.round(shares * currentPrice);
 
@@ -67,13 +64,16 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
           teamId,
           amount,
         });
-        window.location.reload();
+        // 매수 성공 시 sessionStorage에 데이터 저장 후 main 페이지로 이동
+        sessionStorage.setItem('buySuccess', JSON.stringify({ shares, amount }));
+        router.push('/main');
       } else {
         await sell({
           teamId,
           amount,
         });
-        window.location.reload();
+        // 매도 성공 시 바로 main 페이지로 이동
+        router.push('/main');
       }
     } catch (error) {
       alert(error instanceof Error ? error.message : '거래 실패');
@@ -119,13 +119,13 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
     <>
       <div aria-hidden="true" className="h-[12.5rem] w-full" />
       <section className="fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[max(env(safe-area-inset-bottom),1.25rem)]">
-        <div className="flex w-full max-w-[24.5625rem] flex-col gap-4 rounded-2xl border border-white/10 bg-[rgba(5,13,24,0.65)] px-4 py-5 shadow-[0_-20px_45px_rgba(0,0,0,0.7)] backdrop-blur-[20px]">
-          <div className="rounded-xl border border-white/10 bg-gradient-to-br from-black/30 to-[#1e222d] px-4 py-4">
-            <p className="text-xs font-semibold text-white">수량</p>
+        <div className="flex w-full max-w-[448px] flex-col gap-4 rounded-[24px] border border-white/10 bg-[#151A29]/95 px-5 py-5 shadow-[0_-8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+          <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-4">
+            <p className="text-sm font-bold text-white">거래 수량</p>
             {mode && (
               <div className="mt-3 flex items-center gap-2">
-                <label className="flex flex-1 items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white focus-within:border-accent-yellow/60">
-                  <span className="text-sm text-text-secondary">{prefix}</span>
+                <label className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white focus-within:border-accent-yellow/50 focus-within:shadow-[0_0_15px_rgba(239,255,143,0.15)] transition-all">
+                  <span className="text-sm font-medium text-text-tertiary">{prefix}</span>
                   <input
                     ref={inputRef}
                     type="text"
@@ -133,21 +133,21 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
                     value={formattedAmount}
                     onChange={handleAmountChange}
                     placeholder={placeholder}
-                    className="w-full bg-transparent text-right text-lg font-semibold tracking-wide placeholder:text-text-secondary focus:outline-none"
+                    className="w-full bg-transparent text-right text-lg font-bold tracking-wide placeholder:text-text-tertiary focus:outline-none"
                     aria-label="거래 수량 입력"
                   />
                 </label>
                 <button
                   type="button"
                   onClick={handleSetMaxAmount}
-                  className="whitespace-nowrap rounded-lg border border-accent-yellow/30 bg-accent-yellow/10 px-3 py-2 text-xs font-semibold text-accent-yellow hover:bg-accent-yellow/20 transition-colors"
+                  className="whitespace-nowrap rounded-xl border border-accent-yellow/40 bg-accent-yellow/15 px-4 py-3 text-xs font-bold text-accent-yellow hover:bg-accent-yellow/25 hover:scale-105 transition-all"
                   aria-label={mode === 'sell' ? '전체 매도' : '전체 매수'}
                 >
                   {mode === 'sell' ? '전체 매도' : '전체 매수'}
                 </button>
               </div>
             )}
-            <p className={`mt-2 text-sm ${helperClass}`} aria-live="polite">
+            <p className={`mt-3 text-xs ${helperClass}`} aria-live="polite">
               {helperMessage}
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
                 type="button"
                 size="md"
                 variant="sell"
-                className="h-11 rounded-[0.625rem] px-0 text-base"
+                className="h-12 rounded-xl px-0 text-base font-bold hover:scale-[1.02] transition-transform"
                 onClick={() => handleSelectMode('sell')}
                 aria-label="현재 팀 지분 매도하기"
               >
@@ -168,7 +168,7 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
                 type="button"
                 size="md"
                 variant="buy"
-                className="h-11 rounded-[0.625rem] px-0 text-base"
+                className="h-12 rounded-xl px-0 text-base font-bold hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(239,255,143,0.2)]"
                 onClick={() => handleSelectMode('buy')}
                 aria-label="현재 팀 지분 매수하기"
               >
@@ -182,7 +182,7 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
                 variant={canTrade ? 'primary' : 'disabled'}
                 size="md"
                 disabled={!canTrade || isSubmitting}
-                className="h-11 rounded-[0.625rem] px-0 text-base"
+                className="h-12 rounded-xl px-0 text-base font-bold"
                 onClick={handleConfirmTrade}
               >
                 {isSubmitting
@@ -195,7 +195,7 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
                 type="button"
                 onClick={() => handleSelectMode(null)}
                 disabled={isSubmitting}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-accent-yellow disabled:opacity-50"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:bg-white/10 hover:scale-110 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-accent-yellow disabled:opacity-50"
                 aria-label="되돌아가기"
               >
                 <ArrowUturnLeftIcon className="h-5 w-5" aria-hidden="true" />

@@ -8,8 +8,7 @@ import { CarouselGroupSlide } from '@/components/carousel/CarouselGroupSlide';
 import { CarouselCard, CarouselState } from '@/types/carousel';
 import { EMPTY_STATE_MESSAGES, STATE_ORDER } from '@/constants/carousel';
 
-// 캐러셀 설정 상수 (Tailwind 클래스와 동일하게 유지)
-const CAROUSEL_GAP = 10; // gap-2.5 (0.625rem = 10px)와 동기화 필요
+const CAROUSEL_GAP = 10;
 const SCROLL_DEBOUNCE_MS = 50;
 
 export type { CarouselCard } from '@/types/carousel';

@@ -34,8 +34,12 @@ export function parseFormattedNumber(value: string): number {
 /**
  * 숫자를 통화 형식으로 포맷팅 (원화)
  * @param amount - 금액 (숫자)
+ * @param showSymbol - 통화 기호(₩) 표시 여부 (기본값: true)
  * @returns 통화 형식의 문자열 (예: ₩1,000,000)
  */
-export function formatCurrency(amount: number): string {
-  return `₩${formatNumberWithCommas(amount)}`;
+export function formatCurrency(amount: number, showSymbol: boolean = true): string {
+  if (showSymbol) {
+    return `₩${formatNumberWithCommas(amount)}`;
+  }
+  return formatNumberWithCommas(amount);
 }

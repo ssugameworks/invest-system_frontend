@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { cookieManager } from '@/lib/cookies';
+import { cookieManager, type UserInfo } from '@/lib/cookies';
 
 interface User {
   id: number;
@@ -13,18 +13,18 @@ interface AuthState {
   accessToken: string | null;
 }
 
-// 초기 상태 - 쿠키에서 토큰 확인
+// 서버 사이드에서는 항상 빈 상태로 시작
+// 클라이언트 사이드에서 ReduxProvider의 AuthHydration이 쿠키를 읽어서 복원함
 const initialState: AuthState = {
-  isAuthenticated: cookieManager.isTokenValid(),
+  isAuthenticated: false,
   user: null,
-  accessToken: cookieManager.getToken() || null,
+  accessToken: null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // 로그인 성공
     loginSuccess: (
       state,
       action: PayloadAction<{ accessToken: string; user?: User }>
@@ -33,26 +33,27 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user || null;
       
-      // 쿠키에 토큰 저장
       cookieManager.setToken(action.payload.accessToken);
+      
+      if (action.payload.user) {
+        cookieManager.setUserInfo(action.payload.user);
+      }
     },
 
-    // 사용자 정보 설정
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
+      cookieManager.setUserInfo(action.payload);
     },
 
-    // 로그아웃
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
       state.accessToken = null;
       
-      // 쿠키에서 토큰 삭제
       cookieManager.removeToken();
+      cookieManager.removeUserInfo();
     },
 
-    // 토큰 갱신
     refreshToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
       cookieManager.setToken(action.payload);

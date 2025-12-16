@@ -10,6 +10,7 @@ type SvgCapableRule = {
 };
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -18,10 +19,78 @@ const nextConfig: NextConfig = {
         port: '3845',
         pathname: '/assets/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'supabase.io',
+        pathname: '/storage/**',
+      },
     ],
   },
+  async headers() {
+    const posthogDomains = [
+      'https://us.i.posthog.com',
+      'https://eu.i.posthog.com',
+      'https://*.i.posthog.com',
+      'https://us-assets.i.posthog.com',
+      'https://eu-assets.i.posthog.com',
+      'https://*.posthog.com',
+      'https://app.posthog.com',
+      'wss://us.i.posthog.com',
+      'wss://eu.i.posthog.com',
+      'wss://*.i.posthog.com',
+    ];
+    
+    const backendDomains = new Set<string>();
+    
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (apiBaseUrl) {
+      try {
+        const url = new URL(apiBaseUrl);
+        backendDomains.add(apiBaseUrl);
+      } catch {
+        backendDomains.add(apiBaseUrl);
+      }
+    }
+    
+    backendDomains.add('https://*.up.railway.app');
+    backendDomains.add('https://*.railway.app');
+    backendDomains.add('https://invest-systembackend-production.up.railway.app');
+    
+    if (process.env.NODE_ENV !== 'production') {
+      backendDomains.add('http://localhost:3001');
+      backendDomains.add('http://localhost:*');
+    }
+    
+    const backendDomainsArray = Array.from(backendDomains);
+    
+    const scriptSrc = `'self' 'unsafe-eval' 'unsafe-inline' ${posthogDomains.filter(d => d.startsWith('https://')).join(' ')}`;
+    const scriptSrcElem = `'self' 'unsafe-inline' ${posthogDomains.filter(d => d.startsWith('https://')).join(' ')}`;
+    const connectSrc = `'self' ${posthogDomains.join(' ')} ${backendDomainsArray.join(' ')}`;
+    
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              `script-src ${scriptSrc}`,
+              `script-src-elem ${scriptSrcElem}`,
+              `connect-src ${connectSrc}`,
+              "img-src 'self' data: https:",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self' data:",
+            ].join('; '),
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
+  },
   webpack(config) {
-    // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find(
       (rule: unknown): rule is SvgCapableRule =>
         typeof rule === 'object' &&
@@ -36,22 +105,19 @@ const nextConfig: NextConfig = {
     }
 
     config.module.rules.push(
-      // Reapply the existing rule, but only for svg imports ending in ?url
       {
         ...fileLoaderRule,
         test: /\.svg$/i,
-        resourceQuery: /url/, // *.svg?url
+        resourceQuery: /url/,
       },
-      // Convert all other *.svg imports to React components
       {
         test: /\.svg$/i,
         issuer: fileLoaderRule.issuer,
-        resourceQuery: { not: [...(fileLoaderRule.resourceQuery?.not || []), /url/] }, // exclude if *.svg?url
+        resourceQuery: { not: [...(fileLoaderRule.resourceQuery?.not || []), /url/] },
         use: ['@svgr/webpack'],
       },
     );
 
-    // Modify the file loader rule to ignore *.svg, since we have it handled now.
     fileLoaderRule.exclude = /\.svg$/i;
 
     return config;

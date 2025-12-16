@@ -1,8 +1,3 @@
-// ============================================
-// 백엔드 API 응답 타입 정의
-// ============================================
-
-// ========== Auth API ==========
 export interface SignUpRequest {
   schoolNumber: number;
   department: string;
@@ -25,7 +20,6 @@ export interface SignInResponse {
   nickname: string;
 }
 
-// ========== User API ==========
 export interface UserResponse {
   id: number;
   name: string;
@@ -54,7 +48,6 @@ export interface LeaderboardParams {
   pageSize?: number;
 }
 
-// ========== Invest API ==========
 export interface InvestRequest {
   teamId: number;
   amount: number;
@@ -66,18 +59,17 @@ export interface InvestResponse {
   message: string;
 }
 
-// ========== Portfolio API ==========
 export interface TeamInvestmentInfo {
   team_id: number;
   team_name: string;
-  shares: number; // 보유 주식 수
-  invested_amount: number; // 투자 원금
-  average_price: number; // 평균 매수 단가
-  current_price: number; // 현재 주가
-  current_value: number; // 현재 평가액
-  amount: number; // 매도 시 사용할 금액 (current_value와 동일)
-  profit_loss: number; // 평가 손익
-  profit_rate: number; // 수익률 (%)
+  shares: number;
+  invested_amount: number;
+  average_price: number;
+  current_price: number;
+  current_value: number;
+  amount: number;
+  profit_loss: number;
+  profit_rate: number;
 }
 
 export interface PortfolioSummary {
@@ -88,25 +80,28 @@ export interface PortfolioSummary {
   items: TeamInvestmentInfo[];
 }
 
-// ========== Team API ==========
 export type TeamStatus = 'upcoming' | 'ongoing' | 'ended';
+
+export interface TeamMemberInfo {
+  name: string;
+  major: string;
+}
 
 export interface Team {
   id: number;
   teamName: string;
-  members: string[][];
+  members: TeamMemberInfo[];
   status: TeamStatus;
   pitch_url: string;
   money: number | null;
-  p: number | null; // 현재 가격
-  p0: number; // 초기 가격
+  p: number | null;
+  p0: number;
   p1: number | null;
   p2: number | null;
   created_at: string;
   updated_at: string;
 }
 
-// ========== Price API ==========
 export interface PriceItem {
   teamId: number;
   round: number;
@@ -114,7 +109,6 @@ export interface PriceItem {
   tickTs: string;
 }
 
-// ========== Comment API ==========
 export interface CommentEntity {
   id: number;
   team_id: number;
@@ -143,7 +137,6 @@ export interface CreateCommentRequest {
   body: string;
 }
 
-// ========== Error Response ==========
 export interface ErrorResponse {
   message: string;
   error?: string;

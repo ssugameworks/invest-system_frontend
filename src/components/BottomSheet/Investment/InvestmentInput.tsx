@@ -15,10 +15,8 @@ export default function InvestmentInput() {
   const isInvestButtonEnabled = investAmount.length > 0;
 
   const handleInvest = () => {
-    // TODO: 투자 로직 구현
     if (investAmount) {
       const amount = parseInt(investAmount, 10);
-      // API 호출 등 투자 로직
     }
   };
 
