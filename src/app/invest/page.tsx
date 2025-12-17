@@ -71,10 +71,15 @@ function InvestPageContent() {
               // 에러 시 기본값 사용
             }
             
-            // ROI 정보 가져오기 (투자한 경우에만)
+            // ROI 정보 가져오기
             let roi: number | undefined = undefined;
             if (isInvested && portfolioItem) {
+              // 투자한 경우: 실제 ROI 사용
               roi = portfolioItem.profit_rate;
+            } else if (currentPrice > 0) {
+              // 투자하지 않은 경우: 초기 주가 1000원 기준 변동률 계산
+              const INITIAL_PRICE = 1000;
+              roi = ((currentPrice - INITIAL_PRICE) / INITIAL_PRICE) * 100;
             }
             
             return {
@@ -90,7 +95,7 @@ function InvestPageContent() {
               currentPrice: currentPrice > 0 ? currentPrice : undefined,
               isInvested,
               trendDirection,
-              changeRate: roi, // ROI를 changeRate에 저장하여 필터링에 사용
+              changeRate: roi, // ROI 또는 초기 주가 기준 변동률을 changeRate에 저장
             };
           })
         );
@@ -109,10 +114,13 @@ function InvestPageContent() {
   const filteredCards = cards
     .filter((card) => {
       if (filter === 'rising') {
-        // 상승중: 그래프 기울기가 양수이고, ROI가 0%가 아닌 경우만
-        return card.trendDirection === 'up' && (card.changeRate === undefined || card.changeRate > 0);
+        // 상승중: ROI가 0보다 큰 경우만 (ROI > 0)
+        return typeof card.changeRate === 'number' && !isNaN(card.changeRate) && card.changeRate > 0;
       }
-      if (filter === 'falling') return card.trendDirection === 'down';
+      if (filter === 'falling') {
+        // 하락중: ROI가 0보다 작은 경우만 (ROI < 0)
+        return typeof card.changeRate === 'number' && !isNaN(card.changeRate) && card.changeRate < 0;
+      }
       if (filter === 'my') return card.isInvested;
       return true;
     })

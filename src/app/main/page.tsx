@@ -5,13 +5,23 @@ import Header from '@/components/Header';
 import Capital from './containers/Capital';
 import InvestmentTrendSection from './containers/InvestmentTrendSection';
 import Carousel from '@/components/Carousel';
-import PresentationViewer from '@/components/PresentationViewer';
-import { getTeams, getMyPortfolio, getMyInfo } from '@/lib/api';
+import dynamic from 'next/dynamic';
+import type { Team } from '@/lib/api/types';
+
+const PdfViewer = dynamic(() => import('@/components/PdfViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full bg-black/40 rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9', minHeight: '450px' }}>
+      <Skeleton variant="rounded" width="100%" height="100%" animation="wave" />
+    </div>
+  ),
+});
+import { getTeams, getMyPortfolio, getMyInfo, getOngoingTeam, getCurrentSlide } from '@/lib/api';
 import { identifyUser, isPostHogReady } from '@/lib/posthog';
 import type { CarouselCard } from '@/types/carousel';
 import { CarouselCardButton } from '@/components/carousel/CarouselCardButton';
 import BottomNavigation from '@/components/BottomNavigation';
-import { CapitalSkeleton, CarouselCardButtonSkeleton } from '@/components/Skeleton';
+import { CapitalSkeleton, CarouselCardButtonSkeleton, Skeleton } from '@/components/Skeleton';
 import ServiceOpenModal from '@/components/ServiceOpenModal';
 import BuySuccessModal from '@/components/BuySuccessModal';
 import LiveChatPreview from './containers/LiveChatPreview';
@@ -46,8 +56,12 @@ export default function MainPage() {
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showBuySuccessModal, setShowBuySuccessModal] = useState(false);
   const [buySuccessData, setBuySuccessData] = useState<{ shares: number; amount: number } | null>(null);
-  const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
+      const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
+      const [ongoingTeam, setOngoingTeam] = useState<Team | null>(null);
+      const [currentSlide, setCurrentSlide] = useState(1);
+      const [userControlled, setUserControlled] = useState(false); // 수동 모드 여부
 
+  // 초기 데이터 로드 (마운트 시 한 번만)
   useEffect(() => {
     const loadTeams = async () => {
       try {
@@ -71,10 +85,22 @@ export default function MainPage() {
         } catch (error) {
         }
 
-        const [teams, portfolio] = await Promise.all([
+        const [teams, portfolio, ongoingTeamData] = await Promise.all([
           getTeams(),
           getMyPortfolio().catch(() => null),
+          getOngoingTeam().catch(() => null),
         ]);
+
+        // 발표 중인 팀이 있으면 슬라이드 번호도 가져오기
+        if (ongoingTeamData) {
+          setOngoingTeam(ongoingTeamData);
+          try {
+            const slideData = await getCurrentSlide(ongoingTeamData.id);
+            setCurrentSlide(slideData.currentSlide);
+          } catch {
+            setCurrentSlide(1);
+          }
+        }
 
         const investedTeamIds = new Set(
           portfolio?.items.map((item) => item.team_id) || []
@@ -111,7 +137,113 @@ export default function MainPage() {
     };
 
     loadTeams();
-  }, []);
+  }, []); // 마운트 시 한 번만 실행
+
+  // 발표 중인 팀 상태와 슬라이드 번호를 주기적으로 확인 (별도 useEffect로 분리)
+  useEffect(() => {
+    let isMounted = true;
+    let lastCheckTime = 0;
+    let checkInterval: NodeJS.Timeout | null = null;
+    
+    const checkOngoingTeam = async () => {
+      if (!isMounted) return;
+      
+      try {
+        // 발표 중인 팀 확인
+        const ongoingTeamData = await getOngoingTeam().catch(() => null);
+        
+        if (!isMounted) return;
+        
+        if (ongoingTeamData) {
+          // 팀이 변경되었는지 확인 (함수형 업데이트로 최신 상태 참조)
+          setOngoingTeam((prev) => {
+            if (!prev || prev.id !== ongoingTeamData.id) {
+              return ongoingTeamData;
+            }
+            return prev;
+          });
+          
+          // 슬라이드 번호 확인 (함수형 업데이트로 최신 상태 참조)
+          try {
+            const slideData = await getCurrentSlide(ongoingTeamData.id);
+            if (!isMounted) return;
+            
+            setCurrentSlide((prev) => {
+              if (prev !== slideData.currentSlide) {
+                return slideData.currentSlide;
+              }
+              return prev;
+            });
+          } catch {
+            // 에러 무시
+          }
+        } else {
+          // 발표 중인 팀이 없으면 null로 설정
+          setOngoingTeam((prev) => {
+            if (prev) {
+              return null;
+            }
+            return prev;
+          });
+        }
+        
+        lastCheckTime = Date.now();
+      } catch {
+        // 에러 무시
+      }
+    };
+    
+    // 초기 체크
+    checkOngoingTeam();
+    
+    // 3초마다 정기적으로 체크
+    checkInterval = setInterval(() => {
+      checkOngoingTeam();
+    }, 3000);
+    
+    // BroadcastChannel을 사용하여 DB internal에서 변경 시 즉시 반영
+    const channel = new BroadcastChannel('db-internal-updates');
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'slide-changed' || event.data?.type === 'status-changed') {
+        // DB internal에서 변경이 감지되면 즉시 체크
+        checkOngoingTeam();
+      }
+    };
+    channel.addEventListener('message', handleMessage);
+    
+    // 페이지 포커스 시 즉시 체크 (DB internal에서 변경했을 때 다른 탭에서 즉시 반영)
+    const handleFocus = () => {
+      const now = Date.now();
+      // 마지막 체크로부터 500ms 이상 경과했을 때만 체크 (너무 자주 체크 방지)
+      if (now - lastCheckTime >= 500) {
+        checkOngoingTeam();
+      }
+    };
+    
+    // 페이지 가시성 변경 시 체크 (탭 전환 시)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const now = Date.now();
+        if (now - lastCheckTime >= 500) {
+          checkOngoingTeam();
+        }
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isMounted = false;
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+      channel.removeEventListener('message', handleMessage);
+      channel.close();
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []); // 마운트 시 한 번만 설정
 
   // 매수 성공 모달 표시 확인
   useEffect(() => {
@@ -193,7 +325,38 @@ export default function MainPage() {
             )}
           </div>
 
-          <PresentationViewer teamName="불개미" />
+          {ongoingTeam && ongoingTeam.pitch_url ? (
+            <section className="flex w-full flex-col gap-4">
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-red-400 uppercase tracking-wide">Live</span>
+                  </div>
+                  <h2 className="text-lg font-bold text-white">{ongoingTeam.teamName}</h2>
+                </div>
+                <button
+                  onClick={() => setUserControlled(!userControlled)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                    userControlled
+                      ? 'bg-accent-yellow/20 border-accent-yellow/50 text-accent-yellow hover:bg-accent-yellow/30'
+                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                  }`}
+                  title={userControlled ? '자동 모드로 변경' : '수동 모드로 변경'}
+                >
+                  {userControlled ? '자동으로 변경' : '수동으로 변경'}
+                </button>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-[#151A29] p-4 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
+                <PdfViewer 
+                  url={`/api/teams/${ongoingTeam.id}/pitch`} 
+                  externalPageNumber={currentSlide}
+                  userControlled={userControlled}
+                  onUserControlledChange={setUserControlled}
+                />
+              </div>
+            </section>
+          ) : null}
 
           <LiveChatPreview />
 

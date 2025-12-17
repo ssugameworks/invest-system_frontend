@@ -155,9 +155,8 @@ export default function TeamDetailPage() {
         });
 
         // teamInvestment 업데이트 (ROI 갱신)
-        if (teamInvestmentData) {
-          setTeamInvestment(teamInvestmentData);
-        }
+        // teamInvestmentData가 null이어도 setTeamInvestment(null)로 명시적으로 설정하여 상태 업데이트
+        setTeamInvestment(teamInvestmentData);
 
         // 가격 히스토리 업데이트
         if (priceHistoryData.length > 0) {
@@ -415,15 +414,9 @@ export default function TeamDetailPage() {
       );
     }
     
-    // 이전 가격은 priceHistory에서 두 번째로 최신 가격 사용
-    let previousPrice = currentPrice;
-    if (priceHistory.length >= 2) {
-      previousPrice = priceHistory[priceHistory.length - 2].price;
-    } else if (priceHistory.length === 1) {
-      previousPrice = priceHistory[0].price;
-    }
-    
-    const changeRate = previousPrice && previousPrice > 0 ? ((currentPrice - previousPrice) / previousPrice) * 100 : 0;
+    // 초기 주가 1000원 기준으로 변동률 계산
+    const INITIAL_PRICE = 1000;
+    const changeRate = currentPrice && currentPrice > 0 ? ((currentPrice - INITIAL_PRICE) / INITIAL_PRICE) * 100 : 0;
 
     const formatTime = (dateString: string) => {
       const date = new Date(dateString);
@@ -466,14 +459,19 @@ export default function TeamDetailPage() {
               totalInvestment={team.money || 0}
               refreshSeconds={refreshSeconds}
               trendPoints={trendPoints}
-              roi={teamInvestment?.profit_rate}
+              roi={teamInvestment?.profit_rate !== undefined ? teamInvestment.profit_rate : undefined}
             />
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <MemberSpotlight members={members} />
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <PresentationMaterials documents={documents} teamName={team.teamName} />
+            <PresentationMaterials
+              documents={documents}
+              teamName={team.teamName}
+              pitchUrl={team.pitch_url}
+              teamId={team.id}
+            />
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <TradePanel

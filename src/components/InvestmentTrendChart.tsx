@@ -241,6 +241,23 @@ export default function InvestmentTrendChart({
   }, [points.length, changeRate]);
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [canRenderChart, setCanRenderChart] = useState(false);
+
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
+
+    const element = chartContainerRef.current;
+    const observer = new ResizeObserver((entries) => {
+      const rect = entries[0].contentRect;
+      setCanRenderChart(rect.width > 0 && rect.height > 0);
+    });
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div
@@ -251,110 +268,112 @@ export default function InvestmentTrendChart({
       onMouseDown={(e) => e.preventDefault()}
     >
       <div className="h-[154px] w-full px-4 pt-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={chartData}
-            margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
-          >
-            <defs>
-              {/* 노란색 그래디언트 (상승) */}
-              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#EFFF8F" stopOpacity={0.4} />
-                <stop offset="50%" stopColor="#F2FFA2" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#E7FA4F" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#E7FA4F" stopOpacity={1} />
-                <stop offset="30%" stopColor="#F2FFA2" stopOpacity={1} />
-                <stop offset="60%" stopColor="#EFFF8F" stopOpacity={1} />
-                <stop offset="100%" stopColor="#FFFFFF" stopOpacity={1} />
-              </linearGradient>
-              {/* 빨간색 그래디언트 (하락) */}
-              <linearGradient id="colorValueRed" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f87171" stopOpacity={0.4} />
-                <stop offset="50%" stopColor="#fca5a5" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="lineGradientRed" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#ef4444" stopOpacity={1} />
-                <stop offset="30%" stopColor="#f87171" stopOpacity={1} />
-                <stop offset="60%" stopColor="#fca5a5" stopOpacity={1} />
-                <stop offset="100%" stopColor="#fecaca" stopOpacity={1} />
-              </linearGradient>
-              {/* 초록색 그래디언트 (0일 때) */}
-              <linearGradient id="colorValueGreen" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                <stop offset="50%" stopColor="#34d399" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#6ee7b7" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="lineGradientGreen" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#059669" stopOpacity={1} />
-                <stop offset="30%" stopColor="#10b981" stopOpacity={1} />
-                <stop offset="60%" stopColor="#34d399" stopOpacity={1} />
-                <stop offset="100%" stopColor="#6ee7b7" stopOpacity={1} />
-              </linearGradient>
-              <filter id="lineGlow" x="-100%" y="-100%" width="300%" height="300%">
-                <feGaussianBlur stdDeviation="5" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <filter id="strongGlow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-            <XAxis dataKey="label" hide />
-            <YAxis hide domain={['auto', 'auto']} />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  if (!data.value) return null;
+        {canRenderChart && (
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
+            >
+              <defs>
+                {/* 노란색 그래디언트 (상승) */}
+                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#EFFF8F" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="#F2FFA2" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#E7FA4F" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#E7FA4F" stopOpacity={1} />
+                  <stop offset="30%" stopColor="#F2FFA2" stopOpacity={1} />
+                  <stop offset="60%" stopColor="#EFFF8F" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity={1} />
+                </linearGradient>
+                {/* 빨간색 그래디언트 (하락) */}
+                <linearGradient id="colorValueRed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f87171" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="#fca5a5" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="lineGradientRed" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={1} />
+                  <stop offset="30%" stopColor="#f87171" stopOpacity={1} />
+                  <stop offset="60%" stopColor="#fca5a5" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#fecaca" stopOpacity={1} />
+                </linearGradient>
+                {/* 초록색 그래디언트 (0일 때) */}
+                <linearGradient id="colorValueGreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="#34d399" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#6ee7b7" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="lineGradientGreen" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#059669" stopOpacity={1} />
+                  <stop offset="30%" stopColor="#10b981" stopOpacity={1} />
+                  <stop offset="60%" stopColor="#34d399" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#6ee7b7" stopOpacity={1} />
+                </linearGradient>
+                <filter id="lineGlow" x="-100%" y="-100%" width="300%" height="300%">
+                  <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="strongGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <XAxis dataKey="label" hide />
+              <YAxis hide domain={['auto', 'auto']} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    if (!data.value) return null;
 
-                  return (
-                    <div className="relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg bg-[#1a1f2e]/95 backdrop-blur-sm border border-white/20 shadow-[0_4px_20px_rgba(176,224,255,0.3)]">
-                      <span className="text-sm font-bold text-white whitespace-nowrap">
-                        {formatValue(data.value)}원
-                      </span>
-                      {/* 말풍선 꼬리 */}
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#1a1f2e]/95 border-l border-b border-white/20 rotate-45"></div>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-              cursor={false}
-            />
-            <Area
-              type="monotoneX"
-              dataKey="value"
-              stroke={chartColor}
-              strokeWidth={3}
-              fillOpacity={1}
-              fill={`url(#${chartGradientId})`}
-              isAnimationActive={true}
-              animationDuration={600}
-              animationEasing="ease-out"
-              connectNulls={true}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              dot={renderDot}
-              activeDot={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+                    return (
+                      <div className="relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg bg-[#1a1f2e]/95 backdrop-blur-sm border border-white/20 shadow-[0_4px_20px_rgba(176,224,255,0.3)]">
+                        <span className="text-sm font-bold text-white whitespace-nowrap">
+                          {formatValue(data.value)}원
+                        </span>
+                        {/* 말풍선 꼬리 */}
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#1a1f2e]/95 border-l border-b border-white/20 rotate-45"></div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+                cursor={false}
+              />
+              <Area
+                type="monotoneX"
+                dataKey="value"
+                stroke={chartColor}
+                strokeWidth={3}
+                fillOpacity={1}
+                fill={`url(#${chartGradientId})`}
+                isAnimationActive={true}
+                animationDuration={600}
+                animationEasing="ease-out"
+                connectNulls={true}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                dot={renderDot}
+                activeDot={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       <div className="relative h-6 w-full px-4 text-xs font-medium text-text-tertiary">

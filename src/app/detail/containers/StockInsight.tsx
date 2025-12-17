@@ -26,7 +26,9 @@ export default function StockInsight({
 }: StockInsightProps) {
   // ROI가 있으면 ROI 기준으로, 없으면 changeRate 기준으로 표시
   // ROI가 0이거나 음수, 양수 모두 표시 (null이나 undefined가 아닌 경우)
-  const hasROI = roi !== undefined && roi !== null;
+  // typeof 체크로 숫자 0도 포함하여 확인 (음수도 포함)
+  // ROI가 있으면 항상 ROI를 우선 사용 (투자 내역이 없어도 초기 주가 기준 ROI가 계산됨)
+  const hasROI = typeof roi === 'number' && !isNaN(roi) && isFinite(roi);
   const displayValue = hasROI ? roi : changeRate;
   
   // ROI가 0이어도 표시 (0은 유효한 값)

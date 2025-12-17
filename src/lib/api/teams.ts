@@ -34,3 +34,39 @@ export const getTeamPriceHistory = async (teamId: number, since?: string): Promi
   return response.data;
 };
 
+/**
+ * 현재 발표 중인 팀 조회 API
+ * GET /api/teams/ongoing
+ */
+export const getOngoingTeam = async (): Promise<Team | null> => {
+  const response = await axiosInstance.get<Team | null>('/api/teams/ongoing');
+  return response.data;
+};
+
+/**
+ * 팀 상태 업데이트 API (인터널용)
+ * PATCH /api/teams/:teamId/status
+ */
+export const updateTeamStatus = async (teamId: number, status: 'upcoming' | 'ongoing' | 'ended'): Promise<Team> => {
+  const response = await axiosInstance.patch<Team>(`/api/teams/${teamId}/status`, { status });
+  return response.data;
+};
+
+/**
+ * 현재 슬라이드 번호 조회 API
+ * GET /api/teams/:teamId/current-slide
+ */
+export const getCurrentSlide = async (teamId: number): Promise<{ currentSlide: number }> => {
+  const response = await axiosInstance.get<{ currentSlide: number }>(`/api/teams/${teamId}/current-slide`);
+  return response.data;
+};
+
+/**
+ * 현재 슬라이드 번호 업데이트 API (인터널용)
+ * POST /api/teams/:teamId/current-slide
+ */
+export const updateCurrentSlide = async (teamId: number, currentSlide: number): Promise<{ currentSlide: number }> => {
+  const response = await axiosInstance.post<{ currentSlide: number }>(`/api/teams/${teamId}/current-slide`, { currentSlide });
+  return response.data;
+};
+

@@ -264,3 +264,44 @@ body {
 .recharts-line .recharts-curve {
   animation: lineDraw 2s ease-out forwards;
 }
+
+/* react-pdf TextLayer and AnnotationLayer styles */
+.react-pdf__Page__textContent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.react-pdf__Page__textContent .textLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  color: transparent;
+  font-family: sans-serif;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.react-pdf__Page__annotations {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.react-pdf__Page__annotations .annotationLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}

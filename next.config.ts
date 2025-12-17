@@ -77,6 +77,10 @@ const nextConfig: NextConfig = {
               `script-src ${scriptSrc}`,
               `script-src-elem ${scriptSrcElem}`,
               `connect-src ${connectSrc}`,
+              // 외부 슬라이드/PDF 임베딩을 위한 frame-src 허용 도메인
+              `frame-src 'self' https://*.supabase.co https://mieoqhpegvdjsvhtwnlb.supabase.co ${backendDomainsArray.join(' ')}`,
+              // PDF.js worker를 위한 worker-src
+              "worker-src 'self' blob:",
               "img-src 'self' data: https:",
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data:",

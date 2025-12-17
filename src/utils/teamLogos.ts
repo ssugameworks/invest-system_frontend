@@ -2,6 +2,8 @@ import venLogo from '@/assets/ven_logo.png';
 import didimLogo from '@/assets/didim_logo.png';
 import avabLogo from '@/assets/avab_logo.png';
 import tioLogo from '@/assets/tio_logo.png';
+import fireantsLogo from '@/assets/fireants_logo.png';
+import slowLogo from '@/assets/slow_logo.png';
 
 export interface TeamLogoMap {
   [key: string]: string;
@@ -22,6 +24,8 @@ export const TEAM_LOGOS: TeamLogoMap = {
   '일식이좋아': didimLogo.src,
   '힙72': avabLogo.src,
   'TIO': tioLogo.src,
+  '불개미': fireantsLogo.src,
+  'SLOW': slowLogo.src,
 };
 
 /**
@@ -47,6 +51,14 @@ export const TEAM_LOGO_CONFIGS: TeamLogoConfigMap = {
   'TIO': {
     logoUrl: tioLogo.src,
     backgroundColor: '#1a2332', // 어두운 파란색
+  },
+  '불개미': {
+    logoUrl: fireantsLogo.src,
+    backgroundColor: '#2b1300', // 딥 오렌지 계열
+  },
+  'SLOW': {
+    logoUrl: slowLogo.src,
+    backgroundColor: '#1b1433', // 딥 퍼플 계열
   },
 };
 

@@ -218,22 +218,13 @@ export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselC
     return points;
   }, [priceHistory, currentPrice]);
 
-  // changeRate 계산 (detail 페이지와 동일한 로직)
+  // changeRate 계산 (초기 주가 1000원 기준)
   const changeRate = useMemo(() => {
     if (!currentPrice || currentPrice === 0) return 0;
     
-    let previousPrice = currentPrice;
-    if (priceHistory.length >= 2) {
-      previousPrice = priceHistory[priceHistory.length - 2].price;
-    } else if (priceHistory.length === 1) {
-      previousPrice = priceHistory[0].price;
-    }
-    
-    if (previousPrice && previousPrice > 0) {
-      return ((currentPrice - previousPrice) / previousPrice) * 100;
-    }
-    return 0;
-  }, [priceHistory, currentPrice]);
+    const INITIAL_PRICE = 1000;
+    return ((currentPrice - INITIAL_PRICE) / INITIAL_PRICE) * 100;
+  }, [currentPrice]);
 
   // detail 페이지의 InvestmentTrendChart와 동일한 스타일로 작은 SVG 그래프 생성
   const chartData = useMemo(() => {
@@ -494,16 +485,17 @@ export function CarouselCardButton({ card, onClick, isInvestedState }: CarouselC
         )}
       </div>
 
-      {/* Price & Change */}
+      {/* Price & ROI */}
       <div className="text-right flex-shrink-0 w-[80px] xs:w-[90px] max-w-[80px] xs:max-w-[90px] overflow-hidden">
         <p className="text-sm xs:text-base font-semibold text-white truncate">
           {currentPrice ? formatWon(currentPrice) : formatWon(card.currentPrice || card.totalInvestment)}
         </p>
-        {showChange && (
-          <p className={`text-xs xs:text-sm font-medium ${changeDirection === 'up' ? 'text-accent-green' : 'text-[#ff3b30]'}`}>
-            {changeText.replace('(', '').replace(')', '')}
+        {/* ROI 표시 (card.changeRate에 ROI 또는 초기 주가 기준 변동률이 저장되어 있음) */}
+        {typeof card.changeRate === 'number' && !isNaN(card.changeRate) && isFinite(card.changeRate) ? (
+          <p className={`text-xs xs:text-sm font-medium ${card.changeRate >= 0 ? 'text-accent-green' : 'text-[#ff3b30]'}`}>
+            {card.changeRate >= 0 ? '+' : ''}{card.changeRate.toFixed(1)}%
           </p>
-        )}
+        ) : null}
       </div>
     </button>
   );

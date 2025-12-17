@@ -94,9 +94,12 @@ export function middleware(request: NextRequest) {
   const scriptSrc = `'self' 'unsafe-eval' 'unsafe-inline' ${posthogDomains.filter(d => d.startsWith('https://')).join(' ')}`;
   const scriptSrcElem = `'self' 'unsafe-inline' ${posthogDomains.filter(d => d.startsWith('https://')).join(' ')}`;
 
+  // PDF.js worker를 위한 worker-src 추가
+  const workerSrc = `'self' blob:`;
+  
   response.headers.set(
     'Content-Security-Policy',
-    `default-src 'self'; script-src ${scriptSrc}; script-src-elem ${scriptSrcElem}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src ${connectSrc}; frame-src 'self'`
+    `default-src 'self'; script-src ${scriptSrc}; script-src-elem ${scriptSrcElem}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src ${connectSrc}; frame-src 'self'; worker-src ${workerSrc}`
   );
 
   return response;
