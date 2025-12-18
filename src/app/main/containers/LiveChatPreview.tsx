@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { fetchRecentComments, type RecentCommentsResult } from '@/lib/api/chat';
 import { useRouter } from 'next/navigation';
 
@@ -8,7 +8,7 @@ type LiveChatPreviewProps = {
   className?: string;
 };
 
-const REFRESH_INTERVAL = 30_000;
+const REFRESH_INTERVAL = 45_000; // 30초 -> 45초로 변경
 const ROTATE_INTERVAL = 5_000;
 
 const FALLBACK_COMMENTS_RESULT: RecentCommentsResult = {
@@ -16,10 +16,26 @@ const FALLBACK_COMMENTS_RESULT: RecentCommentsResult = {
   totalCount: 0,
 };
 
-export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps) {
-  const [commentsState, setCommentsState] = useState<RecentCommentsResult>(
-    FALLBACK_COMMENTS_RESULT,
-  );
+function formatAuthor(comment?: { nickname: string; department: string }): string {
+  if (!comment) return '익명의 투자자';
+  return `${comment.nickname} · ${comment.department}`;
+}
+
+function formatCommentTime(value?: string | Date): string {
+  if (!value) return '';
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return new Intl.DateTimeFormat('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(date);
+}
+
+function LiveChatPreview({ className = '' }: LiveChatPreviewProps) {
+  const [commentsState, setCommentsState] = useState<RecentCommentsResult>(FALLBACK_COMMENTS_RESULT);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
@@ -63,6 +79,10 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
     return () => clearInterval(rotateIntervalId);
   }, [commentsState.comments.length]);
 
+  const handleNavigate = useCallback(() => {
+    router.push('/chat');
+  }, [router]);
+
   const highlightComment = commentsState.comments[currentIndex];
   const totalCount = commentsState.totalCount ?? commentsState.comments.length;
   const message =
@@ -96,7 +116,7 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
         type="button"
         data-node-id="4377:2106"
         className="w-full text-center font-pretendard text-sm font-light text-text-secondary transition-colors hover:text-white"
-        onClick={() => router.push('/chat')}
+        onClick={handleNavigate}
         aria-label={`${totalCount}개의 의견 페이지로 이동`}
       >
         {`${Math.max(totalCount, commentsState.comments.length)}개의 의견 보기 >`}
@@ -105,27 +125,4 @@ export default function LiveChatPreview({ className = '' }: LiveChatPreviewProps
   );
 }
 
-function formatAuthor(comment?: { nickname: string; department: string }): string {
-  if (!comment) {
-    return '익명의 투자자';
-  }
-
-  return `${comment.nickname} · ${comment.department}`;
-}
-
-function formatCommentTime(value?: string | Date): string {
-  if (!value) {
-    return '';
-  }
-
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return '';
-  }
-
-  return new Intl.DateTimeFormat('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(date);
-}
+export default memo(LiveChatPreview);

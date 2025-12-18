@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/Button';
 import { extractNumbers, formatCurrency, formatNumberWithCommas } from '@/utils/formatters';
 import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
-import { invest, sell } from '@/lib/api';
+import { useInvest, useSell } from '@/hooks/useQueries';
 
 type TradePanelProps = {
   teamId?: number;
@@ -17,12 +17,16 @@ type TradePanelProps = {
 
 type TradeMode = 'buy' | 'sell' | null;
 
-export default function TradePanel({ teamId, currentPrice, availableBudget, ownedShares = 0, ownedAmount = 0 }: TradePanelProps) {
+function TradePanel({ teamId, currentPrice, availableBudget, ownedShares = 0, ownedAmount = 0 }: TradePanelProps) {
   const router = useRouter();
   const [rawAmount, setRawAmount] = useState('');
   const [mode, setMode] = useState<TradeMode>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // React Query mutations 사용
+  const investMutation = useInvest();
+  const sellMutation = useSell();
+  const isSubmitting = investMutation.isPending || sellMutation.isPending;
 
   const formattedBudget = formatCurrency(availableBudget);
   const formattedAmount = rawAmount ? formatNumberWithCommas(rawAmount) : '';
@@ -33,56 +37,46 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
   const exceedsShares = mode === 'sell' && numericAmount > ownedShares;
   const canTrade = Boolean(mode) && numericAmount > 0 && !exceedsBudget && !exceedsShares;
 
-  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAmountChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setRawAmount(extractNumbers(event.target.value).slice(0, 9));
-  };
+  }, []);
 
-  const handleSelectMode = (nextMode: TradeMode) => {
+  const handleSelectMode = useCallback((nextMode: TradeMode) => {
     setMode(nextMode);
     setRawAmount('');
-  };
+  }, []);
 
-  const handleSetMaxAmount = () => {
+  const handleSetMaxAmount = useCallback(() => {
     if (mode === 'sell' && ownedShares > 0) {
       setRawAmount(String(Math.round(ownedShares)));
     } else if (mode === 'buy' && availableBudget > 0 && currentPrice > 0) {
       const maxShares = Math.floor(availableBudget / currentPrice);
       setRawAmount(String(maxShares));
     }
-  };
+  }, [mode, ownedShares, availableBudget, currentPrice]);
 
-  const handleConfirmTrade = async () => {
+  const handleConfirmTrade = useCallback(async () => {
     if (!canTrade || !teamId) return;
 
-    setIsSubmitting(true);
-    try {
-      const shares = Math.round(numericAmount);
-      const amount = Math.round(shares * currentPrice);
+    const shares = Math.round(numericAmount);
+    const amount = Math.round(shares * currentPrice);
 
+    try {
       if (mode === 'buy') {
-        await invest({
-          teamId,
-          amount,
-        });
-        // 매수 성공 시 sessionStorage에 데이터 저장 후 main 페이지로 이동
+        await investMutation.mutateAsync({ teamId, amount });
         sessionStorage.setItem('buySuccess', JSON.stringify({ shares, amount }));
         router.push('/main');
       } else {
-        await sell({
-          teamId,
-          amount,
-        });
-        // 매도 성공 시 바로 main 페이지로 이동
+        await sellMutation.mutateAsync({ teamId, amount });
         router.push('/main');
       }
     } catch (error) {
       alert(error instanceof Error ? error.message : '거래 실패');
     } finally {
-      setIsSubmitting(false);
       setMode(null);
       setRawAmount('');
     }
-  };
+  }, [canTrade, teamId, numericAmount, currentPrice, mode, investMutation, sellMutation, router]);
 
   useEffect(() => {
     if (mode) {
@@ -91,9 +85,7 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
   }, [mode]);
 
   const helperMessage = (() => {
-    if (!mode) {
-      return '매수 또는 매도를 선택하세요';
-    }
+    if (!mode) return '매수 또는 매도를 선택하세요';
 
     if (mode === 'buy') {
       const maxShares = currentPrice > 0 ? Math.floor(availableBudget / currentPrice) : 0;
@@ -208,3 +200,4 @@ export default function TradePanel({ teamId, currentPrice, availableBudget, owne
   );
 }
 
+export default memo(TradePanel);

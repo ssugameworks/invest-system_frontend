@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { getMyInfo, getMyPortfolio } from '@/lib/api';
+import { usePortfolio } from '@/hooks/useQueries';
 import { formatCurrency } from '@/utils/formatters';
 import { ArrowPathRoundedSquareIcon } from '@heroicons/react/24/outline';
 
@@ -11,51 +11,37 @@ type CapitalProps = {
   initialCapital?: number;
 };
 
-export default function Capital({ className = '', initialCapital }: CapitalProps) {
+function Capital({ className = '', initialCapital }: CapitalProps) {
   const router = useRouter();
-  const [cash, setCash] = useState<number | null>(initialCapital ?? null);
-  const [stockValue, setStockValue] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadCapitalData = async () => {
-      try {
-        // initialCapital이 없으면 API에서 가져오기
-        if (initialCapital === undefined) {
-          const userInfo = await getMyInfo();
-          if (Number.isFinite(userInfo.capital)) {
-            setCash(userInfo.capital);
-          }
-        }
-        // initialCapital이 있으면 이미 useState에서 설정됨
+  // React Query로 포트폴리오 데이터 가져오기 (캐싱 및 자동 업데이트)
+  const { data: portfolio, isLoading } = usePortfolio();
 
-        const portfolio = await getMyPortfolio();
-        if (Number.isFinite(portfolio.current_value)) {
-          setStockValue(portfolio.current_value);
-        }
-      } catch {
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const cash = initialCapital ?? 0;
+  const stockValue = portfolio?.current_value ?? 0;
 
-    loadCapitalData();
-  }, [initialCapital]);
-
-  const toggleView = () => {
+  const toggleView = useCallback(() => {
     setIsAnimating(true);
-    setShowTotal(!showTotal);
+    setShowTotal(prev => !prev);
     setTimeout(() => setIsAnimating(false), 500);
-  };
+  }, []);
 
-  const totalAssets = (cash ?? 0) + (stockValue ?? 0);
-  const displayAmount = showTotal ? totalAssets : (cash ?? 0);
+  const handleSell = useCallback(() => {
+    router.push('/invest?filter=my');
+  }, [router]);
+
+  const handleBuy = useCallback(() => {
+    router.push('/invest?filter=all');
+  }, [router]);
+
+  const totalAssets = cash + stockValue;
+  const displayAmount = showTotal ? totalAssets : cash;
   const label = showTotal ? '총 자산' : '보유 현금';
 
-  // cash가 없고 로딩 중이면 아무것도 표시하지 않음 (메인 페이지에서 스켈레톤 표시)
-  if (isLoading && cash === null) {
+  // 로딩 중이면 아무것도 표시하지 않음 (상위에서 스켈레톤 표시)
+  if (isLoading && cash === 0) {
     return null;
   }
 
@@ -94,11 +80,11 @@ export default function Capital({ className = '', initialCapital }: CapitalProps
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5">
                 <span className="text-xs text-text-tertiary">현금</span>
-                <span className="text-sm font-semibold text-white">{formatCurrency(cash ?? 0)}</span>
+                <span className="text-sm font-semibold text-white">{formatCurrency(cash)}</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5">
                 <span className="text-xs text-text-tertiary">주식</span>
-                <span className="text-sm font-semibold text-accent-yellow">{formatCurrency(stockValue ?? 0)}</span>
+                <span className="text-sm font-semibold text-accent-yellow">{formatCurrency(stockValue)}</span>
               </div>
             </div>
           )}
@@ -109,14 +95,14 @@ export default function Capital({ className = '', initialCapital }: CapitalProps
       <div className="flex w-full gap-3">
         <button 
           className="group relative flex-1 min-w-0 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] py-4 text-base font-bold text-white border border-white/10 hover:border-white/20 hover:from-white/[0.12] hover:to-white/[0.04] transition-all duration-300 overflow-hidden"
-          onClick={() => router.push('/invest?filter=my')}
+          onClick={handleSell}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
           <span className="relative">매도하기</span>
         </button>
         <button 
           className="group relative flex-1 min-w-0 rounded-2xl bg-gradient-to-br from-accent-yellow to-accent-yellow/80 py-4 text-base font-bold text-background-card hover:from-accent-yellow hover:to-accent-yellow transition-all duration-300 shadow-[0_0_20px_rgba(239,255,143,0.15)] hover:shadow-[0_0_30px_rgba(239,255,143,0.3)] overflow-hidden"
-          onClick={() => router.push('/invest?filter=all')}
+          onClick={handleBuy}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
           <span className="relative">매수하기</span>
@@ -125,3 +111,5 @@ export default function Capital({ className = '', initialCapital }: CapitalProps
     </section>
   );
 }
+
+export default memo(Capital);

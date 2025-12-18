@@ -1,11 +1,31 @@
 'use client';
 
+import { memo } from 'react';
+import dynamic from 'next/dynamic';
 import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
-import InvestmentTrendChart from '@/components/InvestmentTrendChart';
 import AnimatedNumber from '@/components/AnimatedNumber';
 import AnimatedPercent from '@/components/AnimatedPercent';
 import type { InvestmentTrendPoint } from '@/api/api';
 import { formatCurrency } from '@/utils/formatters';
+import { Skeleton } from '@/components/Skeleton';
+
+// 차트 컴포넌트 동적 import (무거운 recharts 라이브러리 지연 로딩)
+const InvestmentTrendChart = dynamic(
+  () => import('@/components/InvestmentTrendChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="relative flex w-full flex-col gap-4 overflow-hidden rounded-[1.5rem] bg-[#0D1525] border border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)]">
+        <div className="h-[154px] w-full px-4 pt-4">
+          <Skeleton variant="rounded" width="100%" height="100%" animation="wave" />
+        </div>
+        <div className="h-6 w-full px-4">
+          <Skeleton variant="text" height={16} width="100%" animation="wave" />
+        </div>
+      </div>
+    ),
+  }
+);
 
 type StockInsightProps = {
   currentPrice: number;
@@ -13,10 +33,10 @@ type StockInsightProps = {
   totalInvestment: number;
   refreshSeconds: number;
   trendPoints: InvestmentTrendPoint[];
-  roi?: number; // ROI (수익률) - 선택적 prop
+  roi?: number;
 };
 
-export default function StockInsight({
+function StockInsight({
   currentPrice,
   changeRate,
   totalInvestment,
@@ -24,19 +44,13 @@ export default function StockInsight({
   trendPoints,
   roi,
 }: StockInsightProps) {
-  // ROI가 있으면 ROI 기준으로, 없으면 changeRate 기준으로 표시
-  // ROI가 0이거나 음수, 양수 모두 표시 (null이나 undefined가 아닌 경우)
-  // typeof 체크로 숫자 0도 포함하여 확인 (음수도 포함)
-  // ROI가 있으면 항상 ROI를 우선 사용 (투자 내역이 없어도 초기 주가 기준 ROI가 계산됨)
   const hasROI = typeof roi === 'number' && !isNaN(roi) && isFinite(roi);
   const displayValue = hasROI ? roi : changeRate;
   
-  // ROI가 0이어도 표시 (0은 유효한 값)
-  const shouldDisplayROI = hasROI;
-  const isPositiveChange = displayValue > 0; // 0은 양수로 처리하지 않음
+  const isPositiveChange = displayValue > 0;
   const isNegativeChange = displayValue < 0;
   const TrendIcon = isPositiveChange ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
-  const changeColor = isPositiveChange ? '#efff8f' : (isNegativeChange ? '#f87171' : '#9ca3af'); // 0일 때는 회색
+  const changeColor = isPositiveChange ? '#efff8f' : (isNegativeChange ? '#f87171' : '#9ca3af');
 
   return (
     <section className="flex flex-col gap-5" style={{ position: 'relative', zIndex: 10 }}>
@@ -90,3 +104,4 @@ export default function StockInsight({
   );
 }
 
+export default memo(StockInsight);

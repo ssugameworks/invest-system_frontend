@@ -1,22 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import Header from '@/components/Header';
 import Capital from './containers/Capital';
-import InvestmentTrendSection from './containers/InvestmentTrendSection';
-import Carousel from '@/components/Carousel';
 import dynamic from 'next/dynamic';
 import type { Team } from '@/lib/api/types';
-
-const PdfViewer = dynamic(() => import('@/components/PdfViewer'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full bg-black/40 rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9', minHeight: '450px' }}>
-      <Skeleton variant="rounded" width="100%" height="100%" animation="wave" />
-    </div>
-  ),
-});
-import { getTeams, getMyPortfolio, getMyInfo, getOngoingTeam, getCurrentSlide } from '@/lib/api';
+import { useUser, useTeams, usePortfolio, useOngoingTeam, useCurrentSlide } from '@/hooks/useQueries';
 import { identifyUser, isPostHogReady } from '@/lib/posthog';
 import type { CarouselCard } from '@/types/carousel';
 import { CarouselCardButton } from '@/components/carousel/CarouselCardButton';
@@ -25,15 +14,25 @@ import { CapitalSkeleton, CarouselCardButtonSkeleton, Skeleton } from '@/compone
 import ServiceOpenModal from '@/components/ServiceOpenModal';
 import BuySuccessModal from '@/components/BuySuccessModal';
 import LiveChatPreview from './containers/LiveChatPreview';
-import type { UserResponse } from '@/lib/api/types';
+
+// 무거운 컴포넌트는 동적 import로 지연 로딩
+const PdfViewer = dynamic(() => import('@/components/PdfViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full bg-black/40 rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9', minHeight: '450px' }}>
+      <Skeleton variant="rounded" width="100%" height="100%" animation="wave" />
+    </div>
+  ),
+});
 
 const SERVICE_OPEN_DATE = new Date('2025-12-19T19:00:00+09:00');
 
+// 상수는 컴포넌트 외부로
+const POLLING_INTERVAL = 5000; // 5초로 조정 (기존 3초에서 변경)
+
 const getAllowedSchoolNumbers = (): number[] => {
   const envValue = process.env.NEXT_PUBLIC_ALLOWED_SCHOOL_NUMBERS;
-  if (!envValue) {
-    return [];
-  }
+  if (!envValue) return [];
   return envValue
     .split(',')
     .map(num => parseInt(num.trim(), 10))
@@ -41,209 +40,58 @@ const getAllowedSchoolNumbers = (): number[] => {
 };
 
 function isServiceOpen(): boolean {
-  const now = new Date();
-  return now >= SERVICE_OPEN_DATE;
+  return new Date() >= SERVICE_OPEN_DATE;
 }
 
 function isAllowedUser(schoolNumber: number): boolean {
-  const allowedNumbers = getAllowedSchoolNumbers();
-  return allowedNumbers.includes(schoolNumber);
+  return getAllowedSchoolNumbers().includes(schoolNumber);
 }
 
+// CarouselCardButton을 메모이제이션
+const MemoizedCarouselCardButton = memo(CarouselCardButton);
+
 export default function MainPage() {
-  const [cards, setCards] = useState<CarouselCard[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showBuySuccessModal, setShowBuySuccessModal] = useState(false);
   const [buySuccessData, setBuySuccessData] = useState<{ shares: number; amount: number } | null>(null);
-      const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
-      const [ongoingTeam, setOngoingTeam] = useState<Team | null>(null);
-      const [currentSlide, setCurrentSlide] = useState(1);
-      const [userControlled, setUserControlled] = useState(false); // 수동 모드 여부
+  const [userControlled, setUserControlled] = useState(false);
 
-  // 초기 데이터 로드 (마운트 시 한 번만)
+  // React Query hooks 사용 - 자동 캐싱 및 재시도
+  const { data: userInfo, isLoading: isUserLoading } = useUser();
+  const { data: teams = [], isLoading: isTeamsLoading } = useTeams();
+  const { data: portfolio } = usePortfolio();
+  
+  // 발표 중인 팀 폴링 (5초 간격, 화면이 보일 때만)
+  const { data: ongoingTeam } = useOngoingTeam(POLLING_INTERVAL);
+  
+  // 슬라이드 번호 폴링 (발표 중인 팀이 있고, 수동 모드가 아닐 때만)
+  const shouldPollSlide = ongoingTeam?.id && !userControlled;
+  const { data: slideData } = useCurrentSlide(
+    ongoingTeam?.id ?? null,
+    shouldPollSlide ? POLLING_INTERVAL : false
+  );
+  const currentSlide = slideData?.currentSlide ?? 1;
+
+  const isLoading = isUserLoading || isTeamsLoading;
+
+  // 서비스 오픈 체크 및 PostHog 식별
   useEffect(() => {
-    const loadTeams = async () => {
-      try {
-        try {
-          const userInfoData = await getMyInfo();
-          setUserInfo(userInfoData);
-          
-          if (!isServiceOpen() && !isAllowedUser(userInfoData.schoolNumber)) {
-            setShowServiceModal(true);
-            return;
-          }
-          
-          if (isPostHogReady()) {
-            identifyUser(userInfoData.id, {
-              name: userInfoData.name,
-              nickname: userInfoData.name,
-              schoolNumber: userInfoData.schoolNumber,
-              department: userInfoData.department,
-            });
-          }
-        } catch (error) {
-        }
+    if (!userInfo) return;
 
-        const [teams, portfolio, ongoingTeamData] = await Promise.all([
-          getTeams(),
-          getMyPortfolio().catch(() => null),
-          getOngoingTeam().catch(() => null),
-        ]);
+    if (!isServiceOpen() && !isAllowedUser(userInfo.schoolNumber)) {
+      setShowServiceModal(true);
+      return;
+    }
 
-        // 발표 중인 팀이 있으면 슬라이드 번호도 가져오기
-        if (ongoingTeamData) {
-          setOngoingTeam(ongoingTeamData);
-          try {
-            const slideData = await getCurrentSlide(ongoingTeamData.id);
-            setCurrentSlide(slideData.currentSlide);
-          } catch {
-            setCurrentSlide(1);
-          }
-        }
-
-        const investedTeamIds = new Set(
-          portfolio?.items.map((item) => item.team_id) || []
-        );
-
-        const carouselCards: CarouselCard[] = teams.map((team) => {
-          const isInvested = investedTeamIds.has(team.id);
-          const portfolioItem = portfolio?.items.find((item) => item.team_id === team.id);
-          // p만 사용 (p0 제거)
-          const currentPrice = team.p || 0;
-          
-          return {
-            id: team.id,
-            image: team.pitch_url || undefined,
-            title: team.teamName,
-            subtitle: isInvested && portfolioItem
-              ? `${Math.round(portfolioItem.shares)}주`
-              : currentPrice > 0
-                ? `현재가: ${currentPrice.toLocaleString()}원`
-                : '가격 정보 없음',
-            totalInvestment: team.money || 0,
-            currentPrice: currentPrice > 0 ? currentPrice : undefined,
-            isInvested,
-          };
-        });
-
-        setCards(carouselCards);
-      } catch {
-        const { sampleCards } = await import('@/constants/carouselSampleCards');
-        setCards(sampleCards);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadTeams();
-  }, []); // 마운트 시 한 번만 실행
-
-  // 발표 중인 팀 상태와 슬라이드 번호를 주기적으로 확인 (별도 useEffect로 분리)
-  useEffect(() => {
-    let isMounted = true;
-    let lastCheckTime = 0;
-    let checkInterval: NodeJS.Timeout | null = null;
-    
-    const checkOngoingTeam = async () => {
-      if (!isMounted) return;
-      
-      try {
-        // 발표 중인 팀 확인
-        const ongoingTeamData = await getOngoingTeam().catch(() => null);
-        
-        if (!isMounted) return;
-        
-        if (ongoingTeamData) {
-          // 팀이 변경되었는지 확인 (함수형 업데이트로 최신 상태 참조)
-          setOngoingTeam((prev) => {
-            if (!prev || prev.id !== ongoingTeamData.id) {
-              return ongoingTeamData;
-            }
-            return prev;
-          });
-          
-          // 슬라이드 번호 확인 (함수형 업데이트로 최신 상태 참조)
-          try {
-            const slideData = await getCurrentSlide(ongoingTeamData.id);
-            if (!isMounted) return;
-            
-            setCurrentSlide((prev) => {
-              if (prev !== slideData.currentSlide) {
-                return slideData.currentSlide;
-              }
-              return prev;
-            });
-          } catch {
-            // 에러 무시
-          }
-        } else {
-          // 발표 중인 팀이 없으면 null로 설정
-          setOngoingTeam((prev) => {
-            if (prev) {
-              return null;
-            }
-            return prev;
-          });
-        }
-        
-        lastCheckTime = Date.now();
-      } catch {
-        // 에러 무시
-      }
-    };
-    
-    // 초기 체크
-    checkOngoingTeam();
-    
-    // 3초마다 정기적으로 체크
-    checkInterval = setInterval(() => {
-      checkOngoingTeam();
-    }, 3000);
-    
-    // BroadcastChannel을 사용하여 DB internal에서 변경 시 즉시 반영
-    const channel = new BroadcastChannel('db-internal-updates');
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'slide-changed' || event.data?.type === 'status-changed') {
-        // DB internal에서 변경이 감지되면 즉시 체크
-        checkOngoingTeam();
-      }
-    };
-    channel.addEventListener('message', handleMessage);
-    
-    // 페이지 포커스 시 즉시 체크 (DB internal에서 변경했을 때 다른 탭에서 즉시 반영)
-    const handleFocus = () => {
-      const now = Date.now();
-      // 마지막 체크로부터 500ms 이상 경과했을 때만 체크 (너무 자주 체크 방지)
-      if (now - lastCheckTime >= 500) {
-        checkOngoingTeam();
-      }
-    };
-    
-    // 페이지 가시성 변경 시 체크 (탭 전환 시)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        const now = Date.now();
-        if (now - lastCheckTime >= 500) {
-          checkOngoingTeam();
-        }
-      }
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      isMounted = false;
-      if (checkInterval) {
-        clearInterval(checkInterval);
-      }
-      channel.removeEventListener('message', handleMessage);
-      channel.close();
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []); // 마운트 시 한 번만 설정
+    if (isPostHogReady()) {
+      identifyUser(userInfo.id, {
+        name: userInfo.name,
+        nickname: userInfo.name,
+        schoolNumber: userInfo.schoolNumber,
+        department: userInfo.department,
+      });
+    }
+  }, [userInfo]);
 
   // 매수 성공 모달 표시 확인
   useEffect(() => {
@@ -254,18 +102,52 @@ export default function MainPage() {
         setBuySuccessData(data);
         setShowBuySuccessModal(true);
         sessionStorage.removeItem('buySuccess');
-      } catch (error) {
+      } catch {
         sessionStorage.removeItem('buySuccess');
       }
     }
   }, []);
 
-  const myCards = cards.filter((card) => card.isInvested);
+  // 카드 데이터 메모이제이션
+  const cards = useMemo<CarouselCard[]>(() => {
+    const investedTeamIds = new Set(portfolio?.items.map((item) => item.team_id) || []);
 
-  const handleModalClose = () => {
+    return teams.map((team) => {
+      const isInvested = investedTeamIds.has(team.id);
+      const portfolioItem = portfolio?.items.find((item) => item.team_id === team.id);
+      const currentPrice = team.p || 0;
+
+      return {
+        id: team.id,
+        image: team.pitch_url || undefined,
+        title: team.teamName,
+        subtitle: isInvested && portfolioItem
+          ? `${Math.round(portfolioItem.shares)}주`
+          : currentPrice > 0
+            ? `현재가: ${currentPrice.toLocaleString()}원`
+            : '가격 정보 없음',
+        totalInvestment: team.money || 0,
+        currentPrice: currentPrice > 0 ? currentPrice : undefined,
+        isInvested,
+      };
+    });
+  }, [teams, portfolio]);
+
+  const myCards = useMemo(() => cards.filter((card) => card.isInvested), [cards]);
+
+  const handleModalClose = useCallback(() => {
     setShowServiceModal(false);
     window.location.href = '/login';
-  };
+  }, []);
+
+  const handleBuySuccessClose = useCallback(() => {
+    setShowBuySuccessModal(false);
+    setBuySuccessData(null);
+  }, []);
+
+  const handleUserControlledToggle = useCallback(() => {
+    setUserControlled(prev => !prev);
+  }, []);
 
   return (
     <>
@@ -275,10 +157,7 @@ export default function MainPage() {
       />
       <BuySuccessModal
         isOpen={showBuySuccessModal}
-        onClose={() => {
-          setShowBuySuccessModal(false);
-          setBuySuccessData(null);
-        }}
+        onClose={handleBuySuccessClose}
         shares={buySuccessData?.shares}
         amount={buySuccessData?.amount}
       />
@@ -313,7 +192,7 @@ export default function MainPage() {
               <div className="flex flex-col gap-2 animate-fade-in">
                 {myCards.map((card) => (
                   <div key={card.id} className="w-full">
-                    <CarouselCardButton card={card} />
+                    <MemoizedCarouselCardButton card={card} />
                   </div>
                 ))}
               </div>
@@ -336,7 +215,7 @@ export default function MainPage() {
                   <h2 className="text-lg font-bold text-white">{ongoingTeam.teamName}</h2>
                 </div>
                 <button
-                  onClick={() => setUserControlled(!userControlled)}
+                  onClick={handleUserControlledToggle}
                   className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
                     userControlled
                       ? 'bg-accent-yellow/20 border-accent-yellow/50 text-accent-yellow hover:bg-accent-yellow/30'
