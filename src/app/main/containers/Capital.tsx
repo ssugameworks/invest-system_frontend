@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePortfolio } from '@/hooks/useQueries';
 import { formatCurrency } from '@/utils/formatters';
@@ -15,6 +15,7 @@ function Capital({ className = '', initialCapital }: CapitalProps) {
   const router = useRouter();
   const [showTotal, setShowTotal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // React Query로 포트폴리오 데이터 가져오기 (캐싱 및 자동 업데이트)
   const { data: portfolio, isLoading } = usePortfolio();
@@ -25,7 +26,20 @@ function Capital({ className = '', initialCapital }: CapitalProps) {
   const toggleView = useCallback(() => {
     setIsAnimating(true);
     setShowTotal(prev => !prev);
-    setTimeout(() => setIsAnimating(false), 500);
+    // ⭐ 최적화: 이전 timeout 정리
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => setIsAnimating(false), 500);
+  }, []);
+
+  // ⭐ 최적화: cleanup 추가 (메모리 누수 방지)
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   const handleSell = useCallback(() => {

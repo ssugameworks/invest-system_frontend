@@ -35,6 +35,9 @@ export default function ChatContainer() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isLoadingMoreRef = useRef(false);
 
+  // ⭐ 최적화: 무한 루프 방지 - ref를 사용하여 comments.length 추적
+  const commentsLengthRef = useRef(0);
+  
   const loadLatestComments = useCallback(async () => {
     try {
       const response = await axiosInstance.get<CommentsResponse>('/api/comments', {
@@ -45,18 +48,25 @@ export default function ChatContainer() {
         const newComments = response.data.comments.filter(
           (newComment) => !prev.some((existing) => existing.id === newComment.id)
         );
-        return [...newComments, ...prev];
+        const updated = [...newComments, ...prev];
+        commentsLengthRef.current = updated.length;
+        return updated;
       });
 
       setHasMore(response.data.hasMore);
-      if (comments.length === 0) {
+      if (commentsLengthRef.current === 0) {
         setNextCursor(response.data.nextCursor);
       }
-    } catch {
+    } catch (error) {
+      // ⭐ 최적화: 에러 처리 개선
+      console.error('댓글 로드 실패:', error);
+      if (isInitialLoading) {
+        setIsInitialLoading(false);
+      }
     } finally {
       setIsInitialLoading(false);
     }
-  }, [comments.length]);
+  }, []); // ⭐ 의존성 제거로 무한 루프 방지
 
   const loadMoreComments = useCallback(async () => {
     if (isLoadingMoreRef.current || !hasMore || !nextCursor) return;
@@ -75,7 +85,9 @@ export default function ChatContainer() {
       setComments((prev) => [...prev, ...response.data.comments]);
       setHasMore(response.data.hasMore);
       setNextCursor(response.data.nextCursor);
-    } catch {
+    } catch (error) {
+      // ⭐ 최적화: 에러 처리 개선
+      console.error('추가 댓글 로드 실패:', error);
     } finally {
       setIsLoading(false);
       isLoadingMoreRef.current = false;
@@ -94,11 +106,12 @@ export default function ChatContainer() {
     }
   }, [hasMore, loadMoreComments]);
 
+  // ⭐ 최적화: 초기 로드와 폴링을 하나로 통합
   useEffect(() => {
+    // 초기 로드
     loadLatestComments();
-  }, []);
-
-  useEffect(() => {
+    
+    // 5초마다 자동 갱신
     const interval = setInterval(() => {
       loadLatestComments();
     }, 5000);
@@ -115,7 +128,10 @@ export default function ChatContainer() {
       });
 
       await loadLatestComments();
-    } catch {
+    } catch (error) {
+      // ⭐ 최적화: 에러 처리 개선
+      console.error('댓글 작성 실패:', error);
+      alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
     }
   };
 

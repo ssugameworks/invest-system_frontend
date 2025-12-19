@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect, useState, useCallback, memo } from 'react';
-import { fetchRecentComments, type RecentCommentsResult } from '@/lib/api/chat';
+import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useRecentComments } from '@/hooks/useQueries';
+import type { RecentCommentsResult } from '@/lib/api/chat';
 
 type LiveChatPreviewProps = {
   className?: string;
 };
 
-const REFRESH_INTERVAL = 45_000; // 30초 -> 45초로 변경
+const REFRESH_INTERVAL = 45_000; // 45초 간격
 const ROTATE_INTERVAL = 5_000;
-
-const FALLBACK_COMMENTS_RESULT: RecentCommentsResult = {
-  comments: [],
-  totalCount: 0,
-};
 
 function formatAuthor(comment?: { nickname: string; department: string }): string {
   if (!comment) return '익명의 투자자';
@@ -35,36 +31,18 @@ function formatCommentTime(value?: string | Date): string {
 }
 
 function LiveChatPreview({ className = '' }: LiveChatPreviewProps) {
-  const [commentsState, setCommentsState] = useState<RecentCommentsResult>(FALLBACK_COMMENTS_RESULT);
-  const [isLoading, setIsLoading] = useState(true);
+  // ⭐ 최적화: React Query 사용 (자동 캐싱 및 폴링)
+  const { data: commentsResult, isLoading } = useRecentComments(REFRESH_INTERVAL);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const refreshComments = async () => {
-      try {
-        const next = await fetchRecentComments();
-        if (isMounted) {
-          setCommentsState(next);
-        }
-      } catch {
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
+  // ⭐ 최적화: commentsState를 useMemo로 최적화하여 불필요한 재계산 방지
+  const commentsState: RecentCommentsResult = useMemo(() => {
+    return commentsResult || {
+      comments: [],
+      totalCount: 0,
     };
-
-    refreshComments();
-    const refreshIntervalId = setInterval(refreshComments, REFRESH_INTERVAL);
-
-    return () => {
-      isMounted = false;
-      clearInterval(refreshIntervalId);
-    };
-  }, []);
+  }, [commentsResult]);
 
   useEffect(() => {
     if (commentsState.comments.length <= 1) {
@@ -83,6 +61,7 @@ function LiveChatPreview({ className = '' }: LiveChatPreviewProps) {
     router.push('/chat');
   }, [router]);
 
+  // ⭐ 최적화: 댓글 로테이션 (메모이제이션)
   const highlightComment = commentsState.comments[currentIndex];
   const totalCount = commentsState.totalCount ?? commentsState.comments.length;
   const message =

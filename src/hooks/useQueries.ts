@@ -13,6 +13,7 @@ import {
   invest,
   sell,
 } from '@/lib/api';
+import { fetchRecentComments } from '@/lib/api/chat';
 import type { Team, UserResponse, PortfolioSummary, TeamInvestmentInfo, InvestRequest } from '@/lib/api/types';
 import type { PriceHistory } from '@/lib/api/teams';
 
@@ -26,6 +27,7 @@ export const queryKeys = {
   teamPriceHistory: (id: number) => ['teamPriceHistory', id] as const,
   ongoingTeam: ['ongoingTeam'] as const,
   currentSlide: (teamId: number) => ['currentSlide', teamId] as const,
+  recentComments: ['recentComments'] as const,
 };
 
 // 사용자 정보 조회
@@ -51,18 +53,20 @@ export function usePortfolio() {
 }
 
 // 전체 팀 목록 조회
-export function useTeams() {
+export function useTeams(refetchInterval: number | false = false) {
   return useQuery<Team[]>({
     queryKey: queryKeys.teams,
     queryFn: getTeams,
-    staleTime: 15 * 1000, // 15초 동안 fresh
+    staleTime: 5 * 1000, // ⭐ 최적화: 5초로 단축 (실시간 주가 반영)
     gcTime: 3 * 60 * 1000, // 3분 동안 캐시 유지
     retry: 1,
+    refetchInterval, // ⭐ 최적화: 선택적 자동 폴링 지원
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링 안 함
   });
 }
 
 // 특정 팀 정보 조회
-export function useTeam(teamId: number, enabled = true) {
+export function useTeam(teamId: number, enabled = true, refetchInterval: number | false = false) {
   return useQuery<Team>({
     queryKey: queryKeys.team(teamId),
     queryFn: () => getTeam(teamId),
@@ -70,11 +74,13 @@ export function useTeam(teamId: number, enabled = true) {
     gcTime: 2 * 60 * 1000,
     retry: 1,
     enabled: enabled && !isNaN(teamId),
+    refetchInterval, // ⭐ 최적화: 자동 폴링 지원
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링 안 함
   });
 }
 
 // 팀 투자 정보 조회
-export function useTeamInvestment(teamId: number, enabled = true) {
+export function useTeamInvestment(teamId: number, enabled = true, refetchInterval: number | false = false) {
   return useQuery<TeamInvestmentInfo | null>({
     queryKey: queryKeys.teamInvestment(teamId),
     queryFn: () => getTeamInvestment(teamId).catch(() => null),
@@ -82,11 +88,13 @@ export function useTeamInvestment(teamId: number, enabled = true) {
     gcTime: 2 * 60 * 1000,
     retry: 1,
     enabled: enabled && !isNaN(teamId),
+    refetchInterval,
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링 안 함
   });
 }
 
 // 팀 가격 히스토리 조회
-export function useTeamPriceHistory(teamId: number, enabled = true) {
+export function useTeamPriceHistory(teamId: number, enabled = true, refetchInterval: number | false = false) {
   return useQuery<PriceHistory[]>({
     queryKey: queryKeys.teamPriceHistory(teamId),
     queryFn: () => getTeamPriceHistory(teamId),
@@ -94,6 +102,8 @@ export function useTeamPriceHistory(teamId: number, enabled = true) {
     gcTime: 60 * 1000,
     retry: 1,
     enabled: enabled && !isNaN(teamId),
+    refetchInterval,
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링 안 함
   });
 }
 
@@ -130,8 +140,42 @@ export function useInvest() {
 
   return useMutation({
     mutationFn: (data: InvestRequest) => invest(data),
+    // ⭐ 최적화: Optimistic Update 추가 (즉시 UI 업데이트)
+    onMutate: async (variables) => {
+      // 진행 중인 쿼리 취소
+      await queryClient.cancelQueries({ queryKey: queryKeys.user });
+      await queryClient.cancelQueries({ queryKey: queryKeys.portfolio });
+      await queryClient.cancelQueries({ queryKey: queryKeys.teams });
+
+      // 이전 값 저장 (롤백용)
+      const previousUser = queryClient.getQueryData<UserResponse>(queryKeys.user);
+      const previousPortfolio = queryClient.getQueryData<PortfolioSummary>(queryKeys.portfolio);
+      const previousTeams = queryClient.getQueryData<Team[]>(queryKeys.teams);
+
+      // Optimistic Update
+      if (previousUser) {
+        queryClient.setQueryData<UserResponse>(queryKeys.user, {
+          ...previousUser,
+          capital: Math.max(0, (previousUser.capital ?? 0) - variables.amount),
+        });
+      }
+
+      return { previousUser, previousPortfolio, previousTeams };
+    },
+    onError: (err, variables, context) => {
+      // 에러 시 롤백
+      if (context?.previousUser) {
+        queryClient.setQueryData(queryKeys.user, context.previousUser);
+      }
+      if (context?.previousPortfolio) {
+        queryClient.setQueryData(queryKeys.portfolio, context.previousPortfolio);
+      }
+      if (context?.previousTeams) {
+        queryClient.setQueryData(queryKeys.teams, context.previousTeams);
+      }
+    },
     onSuccess: (_, variables) => {
-      // 관련 쿼리 무효화
+      // 관련 쿼리 무효화 (서버 데이터와 동기화)
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.portfolio });
       queryClient.invalidateQueries({ queryKey: queryKeys.team(variables.teamId) });
@@ -147,8 +191,42 @@ export function useSell() {
 
   return useMutation({
     mutationFn: (data: InvestRequest) => sell(data),
+    // ⭐ 최적화: Optimistic Update 추가 (즉시 UI 업데이트)
+    onMutate: async (variables) => {
+      // 진행 중인 쿼리 취소
+      await queryClient.cancelQueries({ queryKey: queryKeys.user });
+      await queryClient.cancelQueries({ queryKey: queryKeys.portfolio });
+      await queryClient.cancelQueries({ queryKey: queryKeys.teams });
+
+      // 이전 값 저장 (롤백용)
+      const previousUser = queryClient.getQueryData<UserResponse>(queryKeys.user);
+      const previousPortfolio = queryClient.getQueryData<PortfolioSummary>(queryKeys.portfolio);
+      const previousTeams = queryClient.getQueryData<Team[]>(queryKeys.teams);
+
+      // Optimistic Update
+      if (previousUser) {
+        queryClient.setQueryData<UserResponse>(queryKeys.user, {
+          ...previousUser,
+          capital: (previousUser.capital ?? 0) + variables.amount,
+        });
+      }
+
+      return { previousUser, previousPortfolio, previousTeams };
+    },
+    onError: (err, variables, context) => {
+      // 에러 시 롤백
+      if (context?.previousUser) {
+        queryClient.setQueryData(queryKeys.user, context.previousUser);
+      }
+      if (context?.previousPortfolio) {
+        queryClient.setQueryData(queryKeys.portfolio, context.previousPortfolio);
+      }
+      if (context?.previousTeams) {
+        queryClient.setQueryData(queryKeys.teams, context.previousTeams);
+      }
+    },
     onSuccess: (_, variables) => {
-      // 관련 쿼리 무효화
+      // 관련 쿼리 무효화 (서버 데이터와 동기화)
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.portfolio });
       queryClient.invalidateQueries({ queryKey: queryKeys.team(variables.teamId) });
@@ -183,6 +261,19 @@ export function usePrefetchMainData() {
       ]);
     },
   };
+}
+
+// 최근 댓글 조회 (자동 폴링 지원)
+export function useRecentComments(refetchInterval: number | false = false) {
+  return useQuery({
+    queryKey: queryKeys.recentComments,
+    queryFn: () => fetchRecentComments(10),
+    staleTime: 10 * 1000, // 10초 동안 fresh
+    gcTime: 2 * 60 * 1000,
+    retry: 1,
+    refetchInterval,
+    refetchIntervalInBackground: false, // 백그라운드에서는 폴링 안 함
+  });
 }
 
 // 수동으로 쿼리 무효화하는 헬퍼 hook

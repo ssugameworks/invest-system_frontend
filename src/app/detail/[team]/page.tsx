@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/Skeleton';
 import ServiceOpenModal from '@/components/ServiceOpenModal';
 import { getTeamMemberImage } from '@/utils/teamLogos';
 import Header from '@/components/Header';
+import { isServiceOpen, isAllowedUser } from '@/utils/serviceUtils';
 
 // 무거운 컴포넌트 동적 import
 const StockInsight = dynamic(() => import('../containers/StockInsight'), {
@@ -34,26 +35,8 @@ const TradePanel = dynamic(() => import('../containers/TradePanel'), {
   loading: () => <TradePanelSkeleton />,
 });
 
-const SERVICE_OPEN_DATE = new Date('2025-12-19T19:00:00+09:00');
 const POLLING_INTERVAL = 5000; // 5초 간격
 const INITIAL_PRICE = 1000;
-
-const getAllowedSchoolNumbers = (): number[] => {
-  const envValue = process.env.NEXT_PUBLIC_ALLOWED_SCHOOL_NUMBERS;
-  if (!envValue) return [];
-  return envValue
-    .split(',')
-    .map(num => parseInt(num.trim(), 10))
-    .filter(num => !isNaN(num));
-};
-
-function isServiceOpen(): boolean {
-  return new Date() >= SERVICE_OPEN_DATE;
-}
-
-function isAllowedUser(schoolNumber: number): boolean {
-  return getAllowedSchoolNumbers().includes(schoolNumber);
-}
 
 // 스켈레톤 컴포넌트들
 function StockInsightSkeleton() {
@@ -143,34 +126,23 @@ export default function TeamDetailPage() {
 
   // React Query hooks - 자동 캐싱 및 폴링
   const { data: userInfo } = useUser();
+  // ⭐ 최적화: 팀 정보도 자동 폴링 (주가 실시간 반영)
   const { 
     data: team, 
     isLoading: isTeamLoading,
     error: teamError 
-  } = useTeam(teamId, !isNaN(teamId));
+  } = useTeam(teamId, !isNaN(teamId), POLLING_INTERVAL);
   
-  const { data: teamInvestment, refetch: refetchInvestment } = useTeamInvestment(teamId, !isNaN(teamId));
-  const { data: priceHistory = [], refetch: refetchPriceHistory } = useTeamPriceHistory(teamId, !isNaN(teamId));
+  // ⭐ 최적화: React Query의 refetchInterval 사용 (수동 폴링 제거)
+  const { data: teamInvestment } = useTeamInvestment(teamId, !isNaN(teamId), POLLING_INTERVAL);
+  const { data: priceHistory = [] } = useTeamPriceHistory(teamId, !isNaN(teamId), POLLING_INTERVAL);
 
-  // 5초마다 데이터 갱신 (폴링)
-  useEffect(() => {
-    if (isNaN(teamId) || isTeamLoading) return;
-
-    const interval = setInterval(() => {
-      refetchInvestment();
-      refetchPriceHistory();
-      setRefreshSeconds(5);
-    }, POLLING_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, [teamId, isTeamLoading, refetchInvestment, refetchPriceHistory]);
-
-  // 카운트다운
+  // ⭐ 최적화: 카운트다운만 유지 (데이터는 React Query가 자동으로 폴링)
   useEffect(() => {
     if (isNaN(teamId) || isTeamLoading) return;
 
     const countdown = setInterval(() => {
-      setRefreshSeconds((prev) => (prev <= 1 ? 5 : prev - 1));
+      setRefreshSeconds((prev) => (prev <= 1 ? POLLING_INTERVAL / 1000 : prev - 1));
     }, 1000);
 
     return () => clearInterval(countdown);
@@ -183,7 +155,7 @@ export default function TeamDetailPage() {
     }
   }, [userInfo]);
 
-  // 트렌드 포인트 메모이제이션
+  // ⭐ 최적화: 트렌드 포인트 메모이제이션 (currentPrice 의존성 추가로 실시간 업데이트)
   const trendPoints = useMemo<InvestmentTrendPoint[]>(() => {
     if (!team || teamError) return [];
 
@@ -203,6 +175,8 @@ export default function TeamDetailPage() {
       previousPrice = priceHistory[0].price;
     }
 
+    // ⭐ 최적화: formatTime 함수를 useCallback으로 최적화 (useMemo 내부에서 재생성 방지)
+    // formatTime은 useMemo 내부에서만 사용되므로 여기서 정의
     const formatTime = (dateString: string) => {
       const date = new Date(dateString);
       return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
@@ -221,20 +195,29 @@ export default function TeamDetailPage() {
           value: h.price,
         }));
 
-      if (currentPrice) {
-        const lastPoint = points[points.length - 1];
-        if (!lastPoint || lastPoint.value !== currentPrice) {
-          points.push({
-            label: formatTime(new Date().toISOString()),
-            value: currentPrice,
-          });
-        } else {
-          points[points.length - 1] = {
-            label: formatTime(new Date().toISOString()),
-            value: currentPrice,
-          };
-        }
+      // ⭐ 최적화: 항상 현재 가격을 최신 포인트로 추가 (실시간 반영)
+      const lastPoint = points[points.length - 1];
+      const currentTimeLabel = formatTime(new Date().toISOString());
+      
+      if (!lastPoint || lastPoint.value !== currentPrice) {
+        // 현재 가격이 마지막 포인트와 다르면 새 포인트 추가
+        points.push({
+          label: currentTimeLabel,
+          value: currentPrice,
+        });
+      } else {
+        // 같은 가격이어도 시간은 업데이트 (실시간 반영)
+        points[points.length - 1] = {
+          label: currentTimeLabel,
+          value: currentPrice,
+        };
       }
+    } else {
+      // 히스토리가 없어도 현재 가격으로 포인트 생성
+      points = [
+        { label: formatTime(new Date(twoHoursHalfAgo).toISOString()), value: previousPrice },
+        { label: formatTime(new Date().toISOString()), value: currentPrice },
+      ];
     }
 
     if (points.length === 0) {
@@ -250,7 +233,7 @@ export default function TeamDetailPage() {
     }
 
     return points;
-  }, [team, teamError, priceHistory]);
+  }, [team, teamError, priceHistory, team?.p, team?.id]); // ⭐ 모든 관련 의존성 추가
 
   const handleModalClose = useCallback(() => {
     setShowServiceModal(false);

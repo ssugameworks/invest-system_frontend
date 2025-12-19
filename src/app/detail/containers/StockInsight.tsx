@@ -104,4 +104,5 @@ function StockInsight({
   );
 }
 
-export default memo(StockInsight);
+// ⭐ 최적화: memo 제거 (trendPoints가 실시간으로 변경되므로 항상 리렌더링 필요)
+export default StockInsight;

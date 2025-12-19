@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { debounce } from '@/utils/debounce';
 import { useCarouselDrag } from '@/hooks/useCarouselDrag';
 import { CarouselStateTabs } from '@/components/carousel/CarouselStateTabs';
@@ -39,7 +39,8 @@ export default function Carousel({ cards, className = '', onCardClick }: Carouse
   );
   const activeState = STATE_ORDER[currentIndex] ?? 'invested';
 
-  const scrollTo = (index: number) => {
+  // ⭐ 최적화: useCallback으로 메모이제이션하여 불필요한 리렌더링 방지
+  const scrollTo = useCallback((index: number) => {
     if (!containerRef.current || !slides.length) return;
     const container = containerRef.current;
     const firstCard = container.querySelector('[data-carousel-item]') as HTMLElement;
@@ -53,14 +54,15 @@ export default function Carousel({ cards, className = '', onCardClick }: Carouse
       behavior: 'smooth',
     });
     setCurrentIndex(clampedIndex);
-  };
+  }, [slides.length]);
 
-  const handleStateClick = (state: CarouselState) => {
+  // ⭐ 최적화: useCallback으로 메모이제이션
+  const handleStateClick = useCallback((state: CarouselState) => {
     const targetIndex = STATE_ORDER.indexOf(state);
     if (targetIndex >= 0) {
       scrollTo(targetIndex);
     }
-  };
+  }, [scrollTo]);
 
   const debouncedHandleScroll = useMemo(
     () =>

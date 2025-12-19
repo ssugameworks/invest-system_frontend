@@ -71,7 +71,10 @@ function TradePanel({ teamId, currentPrice, availableBudget, ownedShares = 0, ow
         router.push('/main');
       }
     } catch (error) {
-      alert(error instanceof Error ? error.message : '거래 실패');
+      // ⭐ 최적화: 에러 처리 개선
+      const errorMessage = error instanceof Error ? error.message : '거래 실패';
+      console.error('거래 실패:', error);
+      alert(errorMessage);
     } finally {
       setMode(null);
       setRawAmount('');

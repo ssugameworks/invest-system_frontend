@@ -12,29 +12,7 @@ import ServiceOpenModal from '@/components/ServiceOpenModal';
 import { signUpSchema, type SignUpFormData } from '@/schemas/auth.schema';
 import { checkUserExists } from '@/lib/api';
 import { captureEvent, isPostHogReady, identifyUser } from '@/lib/posthog';
-
-const SERVICE_OPEN_DATE = new Date('2025-12-19T19:00:00+09:00');
-
-const getAllowedSchoolNumbers = (): number[] => {
-  const envValue = process.env.NEXT_PUBLIC_ALLOWED_SCHOOL_NUMBERS;
-  if (!envValue) {
-    return [];
-  }
-  return envValue
-    .split(',')
-    .map(num => parseInt(num.trim(), 10))
-    .filter(num => !isNaN(num));
-};
-
-function isServiceOpen(): boolean {
-  const now = new Date();
-  return now >= SERVICE_OPEN_DATE;
-}
-
-function isAllowedUser(schoolNumber: number): boolean {
-  const allowedNumbers = getAllowedSchoolNumbers();
-  return allowedNumbers.includes(schoolNumber);
-}
+import { isServiceOpen, isAllowedUser } from '@/utils/serviceUtils';
 
 function ModalHandler({ onShowModal }: { onShowModal: () => void }) {
   const searchParams = useSearchParams();
@@ -48,7 +26,9 @@ function ModalHandler({ onShowModal }: { onShowModal: () => void }) {
       newUrl.searchParams.delete('showModal');
       router.replace(newUrl.pathname, { scroll: false });
     }
-  }, [searchParams, router, onShowModal]);
+    // ⭐ 최적화: onShowModal을 의존성에서 제거 (불필요한 재실행 방지)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, router]);
 
   return null;
 }

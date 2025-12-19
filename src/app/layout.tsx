@@ -4,6 +4,7 @@ import './globals.css';
 import ReduxProvider from '@/providers/ReduxProvider';
 import QueryProvider from '@/providers/QueryProvider';
 import PostHogProvider from '@/components/PostHogProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.woff2',
@@ -26,13 +27,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={pretendard.variable}>
       <body className={`${pretendard.className} antialiased`}>
-        <PostHogProvider>
-          <ReduxProvider>
-            <QueryProvider>
-              <main className="main_content">{children}</main>
-            </QueryProvider>
-          </ReduxProvider>
-        </PostHogProvider>
+        <ErrorBoundary>
+          <PostHogProvider>
+            <ReduxProvider>
+              <QueryProvider>
+                <main className="main_content">{children}</main>
+              </QueryProvider>
+            </ReduxProvider>
+          </PostHogProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

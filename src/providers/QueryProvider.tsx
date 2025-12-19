@@ -17,12 +17,14 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
             refetchOnWindowFocus: false,
             // 재연결 시 refetch 비활성화
             refetchOnReconnect: false,
-            // 마운트 시 refetch 비활성화 (캐시된 데이터 사용)
-            refetchOnMount: false,
+            // ⭐ 최적화: 마운트 시 stale한 데이터만 refetch (캐시 활용)
+            refetchOnMount: true, // staleTime 내 데이터는 자동으로 캐시 사용됨
             // 재시도 1회
             retry: 1,
             // 재시도 간격 1초
             retryDelay: 1000,
+            // ⭐ 최적화: 네트워크 모드 설정 (오프라인 대응)
+            networkMode: 'online',
           },
           mutations: {
             // mutation 재시도 비활성화

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import {
   Area,
   AreaChart,
@@ -38,26 +38,27 @@ export default function InvestmentTrendChart({
     );
   }
 
+  // ⭐ 최적화: useMemo 내부 함수들을 useCallback으로 분리하여 재생성 방지
+  const parseTimeToMinutes = useCallback((timeStr: string): number => {
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length >= 2) {
+      return parts[0] * 60 + parts[1];
+    }
+    return 0;
+  }, []);
+
+  const formatMinutesToTime = useCallback((totalMinutes: number): string => {
+    const adjusted = ((totalMinutes % (24 * 60)) + 24 * 60) % (24 * 60);
+    const hour = Math.floor(adjusted / 60);
+    const minute = adjusted % 60;
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  }, []);
+
   // X축: 20분 전 ~ 10분 후 (전체 30분 범위)
   // X축 전체를 채우기 위해 30분 범위를 균등하게 나눠서 데이터 생성
   // 떨어지는 구간(값이 급격히 감소하는 부분)을 감지하여 null로 처리
+  // ⭐ 최적화: points가 변경될 때마다 차트 데이터 재계산 (실시간 업데이트)
   const chartData = useMemo(() => {
-    // 시간 문자열을 분 단위로 변환하는 함수
-    const parseTimeToMinutes = (timeStr: string): number => {
-      const parts = timeStr.split(':').map(Number);
-      if (parts.length >= 2) {
-        return parts[0] * 60 + parts[1];
-      }
-      return 0;
-    };
-
-    // 분을 시간 문자열로 변환
-    const formatMinutesToTime = (totalMinutes: number): string => {
-      const adjusted = ((totalMinutes % (24 * 60)) + 24 * 60) % (24 * 60);
-      const hour = Math.floor(adjusted / 60);
-      const minute = adjusted % 60;
-      return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-    };
 
     // 현재 시간 파싱
     const rawCurrentTimeLabel = points[points.length - 1]?.label || '';
@@ -164,7 +165,7 @@ export default function InvestmentTrendChart({
 
     // _timeMinutes 제거하고 반환
     return processedPoints.map(({ _timeMinutes, ...point }) => point);
-  }, [points]);
+  }, [points, parseTimeToMinutes, formatMinutesToTime]);
 
   // 그래프 색상: 항상 노란색으로 표시
   const chartColor = '#EFFF8F'; // 노란색
@@ -210,9 +211,16 @@ export default function InvestmentTrendChart({
 
   const endLabel = `${lastHour.toString().padStart(2, '0')}:${lastMinute.toString().padStart(2, '0')}`;
 
+  // ⭐ 최적화: 타입 안정성 개선 (any 제거)
+  interface DotProps {
+    cx?: number;
+    cy?: number;
+    index?: number;
+  }
+
   // dot 렌더링 함수를 메모이제이션
   const renderDot = useMemo(() => {
-    return (props: any) => {
+    return (props: DotProps) => {
       const { cx, cy, index } = props;
 
       // 현재 시간 지점(인덱스 20)에만 점 표시
@@ -259,6 +267,13 @@ export default function InvestmentTrendChart({
     };
   }, []);
 
+  // ⭐ 최적화: 차트 데이터의 마지막 값으로 key 생성 (데이터 변경 시 애니메이션 트리거)
+  const chartKey = useMemo(() => {
+    if (chartData.length === 0) return 'empty';
+    const lastValue = chartData[chartData.length - 1]?.value;
+    return lastValue ? `chart-${lastValue}-${chartData.length}` : 'chart-empty';
+  }, [chartData]);
+
   return (
     <div
       ref={chartContainerRef}
@@ -271,6 +286,7 @@ export default function InvestmentTrendChart({
         {canRenderChart && (
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart
+              key={chartKey}
               data={chartData}
               margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
             >
@@ -363,7 +379,8 @@ export default function InvestmentTrendChart({
                 fillOpacity={1}
                 fill={`url(#${chartGradientId})`}
                 isAnimationActive={true}
-                animationDuration={600}
+                // ⭐ 최적화: 부드러운 애니메이션 (실시간 업데이트에 최적화)
+                animationDuration={1000}
                 animationEasing="ease-out"
                 connectNulls={true}
                 strokeLinecap="round"

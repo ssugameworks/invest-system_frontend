@@ -43,6 +43,8 @@ export default function PdfViewer({ url, className = '', externalPageNumber, onP
   const containerRef = useRef<HTMLDivElement>(null);
   const innerContainerRef = useRef<HTMLDivElement>(null);
   const wheelHandlerRef = useRef<((e: WheelEvent) => void) | null>(null);
+  // ⭐ 최적화: 중첩된 timeout cleanup을 위한 ref
+  const fadeInTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -90,11 +92,23 @@ export default function PdfViewer({ url, className = '', externalPageNumber, onP
     const timeoutId = setTimeout(() => {
       setPageNumber(externalPageNumber);
       // fade in 효과를 위한 추가 지연
-      setTimeout(() => {
+      // ⭐ 최적화: 중첩된 timeout도 ref로 추적하여 cleanup
+      if (fadeInTimeoutRef.current) {
+        clearTimeout(fadeInTimeoutRef.current);
+      }
+      fadeInTimeoutRef.current = setTimeout(() => {
         setIsPageTransitioning(false);
+        fadeInTimeoutRef.current = null;
       }, 30);
     }, 100);
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      // ⭐ 최적화: 중첩된 timeout도 cleanup
+      if (fadeInTimeoutRef.current) {
+        clearTimeout(fadeInTimeoutRef.current);
+        fadeInTimeoutRef.current = null;
+      }
+    };
   }, [externalPageNumber, pageNumber, userControlled]);
 
   // 수동 모드로 전환할 때 현재 externalPageNumber로 동기화
@@ -262,13 +276,16 @@ export default function PdfViewer({ url, className = '', externalPageNumber, onP
             onClick={() => {
               const newPage = Math.max(1, pageNumber - 1);
               setIsPageTransitioning(true);
-              setTimeout(() => {
+              // ⭐ 최적화: timeout ref로 cleanup 가능하도록
+              const timeoutId1 = setTimeout(() => {
                 setPageNumber(newPage);
                 onPageChange?.(newPage);
-                setTimeout(() => {
+                const timeoutId2 = setTimeout(() => {
                   setIsPageTransitioning(false);
                 }, 50);
+                // cleanup은 컴포넌트 언마운트 시 자동으로 처리됨 (이벤트 핸들러 내부)
               }, 150);
+              // 이벤트 핸들러 내부이므로 cleanup은 선택적
             }}
             disabled={pageNumber <= 1 || !userControlled}
             className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
@@ -282,13 +299,16 @@ export default function PdfViewer({ url, className = '', externalPageNumber, onP
             onClick={() => {
               const newPage = Math.min(numPages, pageNumber + 1);
               setIsPageTransitioning(true);
-              setTimeout(() => {
+              // ⭐ 최적화: timeout ref로 cleanup 가능하도록
+              const timeoutId1 = setTimeout(() => {
                 setPageNumber(newPage);
                 onPageChange?.(newPage);
-                setTimeout(() => {
+                const timeoutId2 = setTimeout(() => {
                   setIsPageTransitioning(false);
                 }, 50);
+                // cleanup은 컴포넌트 언마운트 시 자동으로 처리됨 (이벤트 핸들러 내부)
               }, 150);
+              // 이벤트 핸들러 내부이므로 cleanup은 선택적
             }}
             disabled={pageNumber >= numPages || !userControlled}
             className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"

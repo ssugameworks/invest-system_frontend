@@ -14,6 +14,7 @@ import { CapitalSkeleton, CarouselCardButtonSkeleton, Skeleton } from '@/compone
 import ServiceOpenModal from '@/components/ServiceOpenModal';
 import BuySuccessModal from '@/components/BuySuccessModal';
 import LiveChatPreview from './containers/LiveChatPreview';
+import { isServiceOpen, isAllowedUser } from '@/utils/serviceUtils';
 
 // 무거운 컴포넌트는 동적 import로 지연 로딩
 const PdfViewer = dynamic(() => import('@/components/PdfViewer'), {
@@ -25,27 +26,8 @@ const PdfViewer = dynamic(() => import('@/components/PdfViewer'), {
   ),
 });
 
-const SERVICE_OPEN_DATE = new Date('2025-12-19T19:00:00+09:00');
-
 // 상수는 컴포넌트 외부로
 const POLLING_INTERVAL = 5000; // 5초로 조정 (기존 3초에서 변경)
-
-const getAllowedSchoolNumbers = (): number[] => {
-  const envValue = process.env.NEXT_PUBLIC_ALLOWED_SCHOOL_NUMBERS;
-  if (!envValue) return [];
-  return envValue
-    .split(',')
-    .map(num => parseInt(num.trim(), 10))
-    .filter(num => !isNaN(num));
-};
-
-function isServiceOpen(): boolean {
-  return new Date() >= SERVICE_OPEN_DATE;
-}
-
-function isAllowedUser(schoolNumber: number): boolean {
-  return getAllowedSchoolNumbers().includes(schoolNumber);
-}
 
 // CarouselCardButton을 메모이제이션
 const MemoizedCarouselCardButton = memo(CarouselCardButton);
@@ -58,7 +40,8 @@ export default function MainPage() {
 
   // React Query hooks 사용 - 자동 캐싱 및 재시도
   const { data: userInfo, isLoading: isUserLoading } = useUser();
-  const { data: teams = [], isLoading: isTeamsLoading } = useTeams();
+  // ⭐ 최적화: 팀 목록도 자동 폴링 (주가 실시간 반영)
+  const { data: teams = [], isLoading: isTeamsLoading } = useTeams(POLLING_INTERVAL);
   const { data: portfolio } = usePortfolio();
   
   // 발표 중인 팀 폴링 (5초 간격, 화면이 보일 때만)
@@ -93,19 +76,42 @@ export default function MainPage() {
     }
   }, [userInfo]);
 
-  // 매수 성공 모달 표시 확인
+  // ⭐ 최적화: 매수 성공 모달 표시 확인 (cleanup 개선)
   useEffect(() => {
-    const buySuccessDataStr = sessionStorage.getItem('buySuccess');
-    if (buySuccessDataStr) {
-      try {
-        const data = JSON.parse(buySuccessDataStr);
-        setBuySuccessData(data);
-        setShowBuySuccessModal(true);
-        sessionStorage.removeItem('buySuccess');
-      } catch {
-        sessionStorage.removeItem('buySuccess');
+    let buySuccessDataStr: string | null = null;
+    try {
+      buySuccessDataStr = sessionStorage.getItem('buySuccess');
+      if (buySuccessDataStr) {
+        try {
+          const data = JSON.parse(buySuccessDataStr);
+          setBuySuccessData(data);
+          setShowBuySuccessModal(true);
+        } catch (parseError) {
+          console.error('Failed to parse buySuccess data:', parseError);
+        } finally {
+          // 항상 cleanup 수행
+          try {
+            sessionStorage.removeItem('buySuccess');
+          } catch (storageError) {
+            console.error('Failed to remove buySuccess from sessionStorage:', storageError);
+          }
+        }
       }
+    } catch (storageError) {
+      // sessionStorage 접근 불가 시 무시
+      console.error('Failed to access sessionStorage:', storageError);
     }
+
+    // cleanup: 컴포넌트 언마운트 시에도 정리
+    return () => {
+      try {
+        if (sessionStorage.getItem('buySuccess')) {
+          sessionStorage.removeItem('buySuccess');
+        }
+      } catch {
+        // 무시
+      }
+    };
   }, []);
 
   // 카드 데이터 메모이제이션
